@@ -1,6 +1,6 @@
 MOD_TOP=top
 
-MOD_PATH=src/
+MOD_PATH=src
 
 .PHONY: check
 
