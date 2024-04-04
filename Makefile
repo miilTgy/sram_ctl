@@ -1,9 +1,9 @@
-MOD_TOP=top
+MOD_NAME=top
 
 MOD_PATH=src
 
 .PHONY: check
 
-check: $(MOD_PATH)/$(MOD_TOP).v
+check: $(MOD_PATH)/$(MOD_NAME).v
 	@echo mod top exist!
-	verilator --lint-only $(MOD_PATH)/$(MOD_TOP).v
+	verilator --lint-only $(MOD_PATH)/$(MOD_NAME).v
