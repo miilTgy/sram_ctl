@@ -6,4 +6,4 @@ MOD_PATH=src
 
 check: $(MOD_PATH)/$(MOD_NAME).v
 	@echo mod $(MOD_NAME) exist!
-	verilator --lint-only $(MOD_PATH)/$(MOD_NAME).v
+	verilator --Wall --lint-only $(MOD_PATH)/$(MOD_NAME).v
