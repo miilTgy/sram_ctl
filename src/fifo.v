@@ -17,13 +17,13 @@ module fifo #(
         output  reg [fifo_data_width-1:0]   out_data
     );
 
-    reg [fifo_data_width-1+3:0] fifo [7:0];
+    reg [fifo_data_width-1+3:0] fifo [fifo_num_of_priority-1:0];
     integer i=32'b0;
 
     always @(posedge clk ) begin
         if (rst) begin
             sop <= 1'b0; eop <= 1'b0; vld <= 1'b0;
-            for (i = 32'b0; i < 32'd8; i++) begin
+            for (i = 32'b0; i < fifo_num_of_priority; i++) begin
                 fifo[i] <= fifo[i] ^ fifo[i];
             end
         end
