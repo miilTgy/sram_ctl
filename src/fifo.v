@@ -10,11 +10,11 @@ module fifo #(
         input                               wr_sop,
         input                               wr_eop,
         input                               wr_vld,
-        input   [fifo_data_width-1:0]       wr_data,
+        input       [fifo_data_width-1:0]   wr_data,
         output  reg                         sop,
         output  reg                         eop,
         output  reg                         vld,
-        output  [fifo_data_width-1:0]       out_data
+        output  reg [fifo_data_width-1:0]   out_data
     );
 
     reg [fifo_data_width-1+3:0] fifo [7:0];
