@@ -24,4 +24,7 @@ check: $(MOD_PATH)/$(MOD_NAME).v
 	@echo mod $(MOD_NAME) exist!
 	$(VERILATOR) $(VERILATOR_FLAGS) $(MOD_PATH)/$(MOD_NAME).v
 
-.PHONY: check build
+clean: $(OBJ_DIR)
+	rm -rf $(OBJ_DIR)
+
+.PHONY: check build clean
