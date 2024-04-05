@@ -44,6 +44,9 @@ module fifo #(
             if (wr_sop) begin
                 working <= 1'b1;
             end
+            if (wr_eop) begin
+                working <= 1'b0;
+            end
             if (working && wr_vld) begin
                 fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, wr_data};
                 wptr <= wptr + 3'b1;
