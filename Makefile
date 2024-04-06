@@ -15,7 +15,7 @@ BIN = $(BUILD_DIR)/$(MOD_NAME)
 all: default
 default: $(BIN)
 
-$(BIN): $(MOD_PATH)/$(MOD_NAME).v
+$(BIN): $(MOD_PATH)/$(MOD_NAME).v $(TB_PATH)/$(MOD_NAME)_tb.cpp
 	rm -rf $(OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_TFLAGS) \
 		--top-module $(MOD_NAME) \
@@ -37,7 +37,12 @@ check: $(MOD_PATH)/$(MOD_NAME).v
 run: $(OBJ_DIR)/V$(MOD_NAME)
 	$(OBJ_DIR)/V$(MOD_NAME)
 
+show: dump.vcd
+	gtkwave dump.vcd
+
+wave: all run show
+
 clean: $(OBJ_DIR)
 	rm -rf $(OBJ_DIR)
 
-.PHONY: default check build clean run
+.PHONY: default check build clean run show wave
