@@ -33,7 +33,7 @@ module fifo #(
         end else begin
             // read out
             if (ready) begin
-                if (!next_data) begin
+                if (next_data) begin
                     rptr <= rptr + 3'b1;
                     if (wptr == rptr+3'b1) begin // if fifo_buf is empty
                         ready <= 1'b0; // reset ready
