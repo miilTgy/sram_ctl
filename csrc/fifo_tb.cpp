@@ -98,4 +98,8 @@ void load_data() {
     step_and_dump_wave();
     fifo->wr_eop = 0;
     step_and_dump_wave();
+    fifo->next_data = 1;
+    for (size_t i = 0; i < 10; i++) {
+        step_and_dump_wave();
+    }
 }
