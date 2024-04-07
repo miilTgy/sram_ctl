@@ -1,13 +1,11 @@
-/*
-2024年4月3日创建。
-Created in April, 3rd, 2024.
-此模块是顶层模块。
-This is a top module.
-请不要在此模块中完成任何逻辑过程。
-Please do not write ant logical code in this module.
-此模块中只能例化和拉线。
-You can only instantiate modules or creat wire/regs in this module.
-*/
+// 2024年4月3日创建。
+// Created in April, 3rd, 2024.
+// 此模块是顶层模块。
+// This is a top module.
+// 请不要在此模块中完成任何逻辑过程。
+// Please do not write ant logical code in this module.
+// 此模块中只能例化和拉线。
+// You can only instantiate modules or creat wire/regs in this module.
 
 module top #(
         // parameters
