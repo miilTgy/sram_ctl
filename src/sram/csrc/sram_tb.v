@@ -1,3 +1,8 @@
+`include "sramc_top.v" 
+`include "sram_core.v" 
+`include "sram_bist.v" 
+`include "ahb_slave_if.v"
+
 module sram_tb(); // no port
 
 reg			    hclk;
@@ -68,9 +73,9 @@ initial begin
 	end
 end
 
-initial begin
-  $vcdpluson();  // vcs dump waveform
-end
+//initial begin
+//  $vcdpluson();  // vcs dump waveform
+//end
 
 parameter  IDLE   = 2'b00,
            BUSY   = 2'b01,
