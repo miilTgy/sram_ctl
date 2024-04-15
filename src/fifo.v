@@ -1,7 +1,7 @@
 module fifo #(
         // parameters
-        fifo_data_width = 16, // should be 256
-        fifo_num_of_priority = 8
+        parameter fifo_data_width      = 16,   // should be 256
+        parameter fifo_num_of_priority = 8
     ) (
         // ports
         input                               rst,
