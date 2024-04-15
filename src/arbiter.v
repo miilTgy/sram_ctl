@@ -1,13 +1,14 @@
 module arbiter #(
     // parameters
-    parameter arbiter_data_width = 256
+    parameter arbiter_data_width = 256,
+    parameter num_of_ports       = 16;
 ) (
     // ports
-    input rst,
-    input clk,
-    input sp0_wrr1,
-    input [arbiter_data_width-1:0] data_in,
-    output reg [arbiter_data_width-1:0] data_out
+    input                                   rst,
+    input                                   clk,
+    input                                   sp0_wrr1,
+    input       [arbiter_data_width-1:0]    data_in     [num_of_ports-1:0],
+    output  reg [arbiter_data_width-1:0]    data_out
 );
 
     always @(posedge clk ) begin
@@ -21,7 +22,7 @@ module arbiter #(
                 1'b1: begin // *WRR加权轮询调度
                     // TODO
                 end
-                default: // TODO
+                default: data_out <= data_out;
             endcase
         end
     end
