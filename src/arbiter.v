@@ -13,6 +13,16 @@ module arbiter #(
     always @(posedge clk ) begin
         if (rst) begin
             data_out <= {arbiter_data_width{1'b0}};
+        end else begin
+            case (sp0_wrr1)
+                1'b0: begin // *SP严格优先级
+                    // TODO
+                end
+                1'b1: begin // *WRR加权轮询调度
+                    // TODO
+                end
+                default: // TODO
+            endcase
         end
     end
     
