@@ -1,4 +1,4 @@
-MOD_NAME = fifo
+MOD_NAME = arbiter
 
 MOD_PATH = src
 TB_PATH = csrc
