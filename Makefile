@@ -1,4 +1,4 @@
-MOD_NAME = arbiter
+MOD_NAME = write_arbiter
 
 MOD_PATH = src
 TB_PATH = csrc
@@ -7,6 +7,8 @@ VERILATOR = verilator
 VERILATOR_FLAGS = --Wall --lint-only
 VERILATOR_TFLAGS = --Wall --cc --exe --build -j 0
 VERILATOR_BFLAGS = --Wall --cc --build -j 0 -MMD -O3 --x-assign fast --x-initial fast --noassert
+
+IVERILOG = iverilog
 					
 BUILD_DIR = ./build
 OBJ_DIR = $(BUILD_DIR)/obj_dir
@@ -45,4 +47,20 @@ wave: all run show
 clean: $(OBJ_DIR)
 	rm -rf $(OBJ_DIR)
 
-.PHONY: default check build clean run show wave
+ibuild: $(MOD_PATH)/$(MOD_NAME).v
+	rm a.out
+	$(IVERILOG) $(MOD_PATH)/$(MOD_NAME).v
+
+itest: $(MOD_PATH)/$(MOD_NAME).v $(TB_PATH)/$(MOD_NAME)_tb.v
+	rm a.out
+	$(IVERILOG) $(TB_PATH)/$(MOD_NAME)_tb.v $(MOD_PATH)/$(MOD_NAME).v
+
+irun: ./a.out
+	./a.out
+
+ishow: ./waveform.vcd
+	gtkwave waveform.vcd
+
+iwave: itest irun ishow
+
+.PHONY: default check build clean run show wave ibuild itest irun ishow iwave
