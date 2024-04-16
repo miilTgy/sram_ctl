@@ -1,11 +1,11 @@
-module arbiter_tb ();
+module write_arbiter_tb ();
 
     parameter arbiter_data_width = 256;
     reg clk, rst, sp0_wrr1;
     reg [arbiter_data_width-1:0] data_in;
     wire [arbiter_data_width-1:0] data_out;
 
-    arbiter arbiter_test (
+    write_arbiter arbiter_test (
         .rst        (rst        ),
         .clk        (clk        ),
         .sp0_wrr1   (sp0_wrr1   ),
