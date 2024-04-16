@@ -8,8 +8,13 @@ module write_arbiter #(
     input                                                       rst,
     input                                                       clk,
     input                                                       sp0_wrr1,
+    input           [num_of_ports-1:0]                          ready,
+    input           [num_of_ports-1:0]                          sop,
+    input           [num_of_ports-1:0]                          eop,
+    input           [num_of_ports-1:0]                          vld,
     input   wire    [(num_of_ports * arbiter_data_width)-1:0]   data_in_p,
-    output  reg     [(arbiter_data_width)-1:0]                  data_out
+    output  reg     [(arbiter_data_width)-1:0]                  data_out,
+    output  reg     [num_of_ports-1:0]                          next_data
 );
 
     wire    [arbiter_data_width-1:0]    data_in     [num_of_ports-1:0];
