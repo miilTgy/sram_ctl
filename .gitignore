@@ -1,5 +1,4 @@
 .vscode/
 build/
-dump.vcd
-waveform.vcd
-a.out
+*.vcd
+*.out
