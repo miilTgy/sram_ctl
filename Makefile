@@ -1,4 +1,4 @@
-MOD_NAME = write_arbiter
+MOD_NAME = write_arbiter_sub/channel_selecter
 
 MOD_PATH = src
 TB_PATH = csrc
