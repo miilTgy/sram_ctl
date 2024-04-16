@@ -14,6 +14,7 @@ module write_arbiter #(
 
     wire    [arbiter_data_width-1:0]    data_in     [num_of_ports-1:0];
 
+    // 压缩data_in_p端口
     genvar i;
     generate
         for (i = 0; i < num_of_ports; i = i + 1) begin
