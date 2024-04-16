@@ -1,9 +1,9 @@
 // `define num_of_ports 16
 module write_arbiter #(
+    // parameters
     parameter num_of_ports = 16,
     parameter arbiter_data_width = 256
-)
-(
+) (
     // ports
     input                                                       rst,
     input                                                       clk,
@@ -18,7 +18,7 @@ module write_arbiter #(
     genvar i;
     generate
         for (i = 0; i < num_of_ports; i = i + 1) begin
-            assign data_in[i] = data_in_p[i * arbiter_data_width + arbiter_data_width - 1:i * arbiter_data_width];
+            assign data_in[i] = data_in_p[(i + 1) * arbiter_data_width - 1:i * arbiter_data_width];
         end
     endgenerate
 
