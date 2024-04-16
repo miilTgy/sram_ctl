@@ -9,7 +9,7 @@ module write_arbiter_tb ();
         .rst        (rst        ),
         .clk        (clk        ),
         .sp0_wrr1   (sp0_wrr1   ),
-        .data_in    (data_in    ),
+        .data_in_p  (data_in    ),
         .data_out   (data_out   )
     );
 
