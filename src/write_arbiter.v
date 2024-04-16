@@ -9,7 +9,7 @@ module write_arbiter #(
     input                                                       clk,
     input                                                       sp0_wrr1,
     input   wire    [(num_of_ports * arbiter_data_width)-1:0]   data_in_p,
-    output  reg     [(num_of_ports)-1:0]                        data_out
+    output  reg     [(arbiter_data_width)-1:0]                  data_out
 );
 
     wire    [arbiter_data_width-1:0]    data_in     [num_of_ports-1:0];
@@ -24,7 +24,7 @@ module write_arbiter #(
 
     always @(posedge clk ) begin
         if (rst) begin
-            data_out <= 1'b0;
+            data_out <= {arbiter_data_width{1'b0}};
         end else begin
             case (sp0_wrr1)
                 1'b0: begin // *SP严格优先级
