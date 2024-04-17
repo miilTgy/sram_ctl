@@ -10,12 +10,12 @@ module channel_selecter #(
     input       [3:0]                                       select,
     input       [(arbiter_data_width * num_of_ports)-1:0]   selected_data_in,
     output  reg [arbiter_data_width-1:0]                    selected_data_out,
-    output  reg [num_of_ports-1:0]                          enabled
+    output  reg [3:0]                                       enabled
 );
 
     wire    [arbiter_data_width-1:0]    datas   [num_of_ports-1:0];
 
-    // 压缩selected_data_in端口
+    // 解压缩selected_data_in端口
     genvar i;
     generate
         for (i = 0; i < num_of_ports; i = i + 1) begin
@@ -48,6 +48,10 @@ module channel_selecter #(
             // endcase
             if (enable) begin
                 selected_data_out <= datas[select];
+                enabled <= select;
+            end else begin
+                selected_data_out <= {256{1'b0}};
+                enabled <= enabled;
             end
         end
     end
