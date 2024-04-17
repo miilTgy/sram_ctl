@@ -1,7 +1,12 @@
-MOD_NAME = write_arbiter_sub/channel_selecter
+MOD_NAME = channel_selecter
 
 MOD_PATH = src
 TB_PATH = csrc
+
+MOD = $(shell find $(abspath $(MOD_PATH)) -name $(MOD_NAME).v)
+iMOD = $(MOD)
+TB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.cpp)
+iTB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.v)
 
 VERILATOR = verilator
 VERILATOR_FLAGS = --Wall --lint-only
@@ -17,24 +22,25 @@ BIN = $(BUILD_DIR)/$(MOD_NAME)
 all: default
 default: $(BIN)
 
-$(BIN): $(MOD_PATH)/$(MOD_NAME).v $(TB_PATH)/$(MOD_NAME)_tb.cpp
+$(BIN): $(MOD) $(TB)
 	rm -rf $(OBJ_DIR)
 	$(VERILATOR) $(VERILATOR_TFLAGS) \
 		--top-module $(MOD_NAME) \
 		--Mdir $(abspath $(OBJ_DIR)) --trace \
-		$(abspath $(TB_PATH)/$(MOD_NAME)_tb.cpp) $(abspath $(MOD_PATH)/$(MOD_NAME).v)
+		$(abspath $(TB)) $(abspath $(MOD))
 
-build: $(MOD_PATH)/$(MOD_NAME).v
+build: $(MOD)
 	rm -rf $(OBJ_DIR)
+	echo $(MOD) $(TB)
 	$(VERILATOR) $(VERILATOR_BFLAGS) \
 		--top-module $(MOD_NAME) \
 		--Mdir $(abspath $(OBJ_DIR)) --trace -o $(abspath $(BIN)) \
-		$(abspath $(MOD_PATH)/$(MOD_NAME).v)
+		$(abspath $(MOD))
 
 
-check: $(MOD_PATH)/$(MOD_NAME).v
+check: $(MOD)
 	@echo mod $(MOD_NAME) exist!
-	$(VERILATOR) $(VERILATOR_FLAGS) $(MOD_PATH)/$(MOD_NAME).v
+	$(VERILATOR) $(VERILATOR_FLAGS) $(MOD)
 
 run: $(OBJ_DIR)/V$(MOD_NAME)
 	$(OBJ_DIR)/V$(MOD_NAME)
@@ -47,13 +53,12 @@ wave: all run show
 clean: $(OBJ_DIR)
 	rm -rf $(OBJ_DIR)
 
-ibuild: $(MOD_PATH)/$(MOD_NAME).v
-	rm a.out
-	$(IVERILOG) $(MOD_PATH)/$(MOD_NAME).v
+ibuild: $(MOD)
+	$(IVERILOG) $(MOD)
 
-itest: $(MOD_PATH)/$(MOD_NAME).v $(TB_PATH)/$(MOD_NAME)_tb.v
+itest: $(MOD) $(iTB)
 	rm a.out
-	$(IVERILOG) $(TB_PATH)/$(MOD_NAME)_tb.v $(MOD_PATH)/$(MOD_NAME).v
+	$(IVERILOG) $(iTB) $(MOD)
 
 irun: ./a.out
 	./a.out
@@ -62,5 +67,8 @@ ishow: ./waveform.vcd
 	gtkwave waveform.vcd
 
 iwave: itest irun ishow
+
+iclean: a.out
+	rm a.out
 
 .PHONY: default check build clean run show wave ibuild itest irun ishow iwave
