@@ -1,4 +1,4 @@
-MOD_NAME = channel_selecter
+MOD_NAME = arbiter_core
 
 MOD_PATH = src
 TB_PATH = csrc
