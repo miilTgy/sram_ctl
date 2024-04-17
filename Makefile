@@ -57,7 +57,6 @@ ibuild: $(MOD)
 	$(IVERILOG) $(MOD)
 
 itest: $(MOD) $(iTB)
-	rm a.out
 	$(IVERILOG) $(iTB) $(MOD)
 
 irun: ./a.out
