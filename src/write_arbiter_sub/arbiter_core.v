@@ -4,6 +4,7 @@ module arbiter_core # (
 ) (
     // port
     input                                   clk,
+    input                                   rst,
     input                                   sp0_wrr1,
     input           [num_of_ports-1:0]      sop,
     input           [num_of_ports*3-1:0]    priority_in,
@@ -13,6 +14,7 @@ module arbiter_core # (
     wire [2:0] priorities [num_of_ports-1:0];
     reg [2:0] bigger;
     reg [3:0] select_tmp;
+    wire busy;
     integer j;
 
     // unzip priority_in
@@ -23,21 +25,29 @@ module arbiter_core # (
         end
     endgenerate
 
+    assign busy = |sop;
+
     always @(posedge clk ) begin
-        if (sp0_wrr1) begin // wrr
-            
-        end else begin      // sp
-            select_tmp = 4'b0;
-            bigger = 3'b0;
-            for (j = 0; j<num_of_ports; j = j + 1) begin
-                if (sop[j]) begin
-                    if (priorities[j] > bigger) begin
-                        bigger = priorities[j];
-                        select_tmp = j[3:0];
+        if (rst) begin
+            select = 4'b0000; select_tmp = 4'b0000;
+        end else if (busy) begin
+            if (sp0_wrr1) begin // wrr
+                bigger <= bigger;
+            end else begin      // sp
+                select_tmp = 4'b0;
+                bigger = 3'b0;
+                for (j = 0; j<num_of_ports; j = j + 1) begin
+                    if (sop[j]) begin
+                        if (priorities[j] > bigger) begin
+                            bigger = priorities[j];
+                            select_tmp = j[3:0];
+                        end
                     end
                 end
+                select = select_tmp;
             end
-            select = select_tmp;
+        end else begin
+            bigger = bigger;
         end
     end
     
