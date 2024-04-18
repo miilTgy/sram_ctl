@@ -7,8 +7,10 @@ module arbiter_core # (
     input                                   rst,
     input                                   sp0_wrr1,
     input           [num_of_ports-1:0]      sop,
+    input           [num_of_ports-1:0]      eop,
     input           [num_of_ports*3-1:0]    priority_in,
-    output  reg     [3:0]                   select
+    output  reg     [3:0]                   select,
+    output  reg                             transfering
 );
 
     wire [2:0] priorities [num_of_ports-1:0];
@@ -29,10 +31,10 @@ module arbiter_core # (
 
     always @(posedge clk ) begin
         if (rst) begin
-            select = 4'b0000; select_tmp = 4'b0000;
-        end else if (busy) begin
+            select = 4'b0000; select_tmp = 4'b0000; transfering = 1'b0;
+        end else if (busy && (!transfering)) begin
             if (sp0_wrr1) begin // wrr
-                bigger <= bigger;
+                bigger = bigger;
             end else begin      // sp
                 select_tmp = 4'b0;
                 bigger = 3'b0;
@@ -45,7 +47,10 @@ module arbiter_core # (
                     end
                 end
                 select = select_tmp;
+                transfering = 1'b1;
             end
+        end else if (transfering && eop[select]) begin
+            transfering = 1'b0;
         end else begin
             bigger = bigger;
         end
