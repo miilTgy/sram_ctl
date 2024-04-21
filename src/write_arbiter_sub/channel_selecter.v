@@ -23,16 +23,16 @@ module channel_selecter #(
         end
     endgenerate
 
-    always @(posedge clk ) begin
+    always @(* ) begin
         if (rst) begin
-            selected_data_out <= 0; enabled <= 0;
+            selected_data_out = 0; enabled = 0;
         end else begin
             if (enable) begin
-                selected_data_out <= datas[select];
-                enabled <= select;
+                selected_data_out = datas[select];
+                enabled = select;
             end else begin
-                selected_data_out <= {256{1'b0}};
-                enabled <= enabled;
+                selected_data_out = {256{1'b0}};
+                // enabled = enabled;
             end
         end
     end
