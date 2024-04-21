@@ -6,7 +6,7 @@ module arbiter_core # (
     input                                   clk,
     input                                   rst,
     input                                   sp0_wrr1,
-    input           [num_of_ports-1:0]      sop,
+    input           [num_of_ports-1:0]      ready,
     input           [num_of_ports-1:0]      eop,
     input           [num_of_ports*3-1:0]    priority_in,
     output  reg     [3:0]                   select,
@@ -27,7 +27,7 @@ module arbiter_core # (
         end
     endgenerate
 
-    assign busy = |sop;
+    assign busy = |ready; // TODO: busy要在ready信号出现的延后一个周期才变，为了与fifo进行时序配合
 
     always @(posedge clk ) begin
         if (rst) begin
@@ -39,7 +39,7 @@ module arbiter_core # (
                 select_tmp = 4'b0;
                 bigger = 3'b0;
                 for (j = 0; j<num_of_ports; j = j + 1) begin
-                    if (sop[j]) begin
+                    if (ready[j]) begin
                         if (priorities[j] > bigger) begin
                             bigger = priorities[j];
                             select_tmp = j[3:0];
