@@ -31,7 +31,7 @@ module channel_selecter #(
                 selected_data_out = datas[select];
                 enabled = select;
             end else begin
-                selected_data_out = {256{1'b0}};
+                selected_data_out = {arbiter_data_width{1'b0}};
                 enabled = enabled;
             end
         end
