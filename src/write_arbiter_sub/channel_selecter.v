@@ -23,7 +23,7 @@ module channel_selecter #(
         end
     endgenerate
 
-    always @(* ) begin
+    always @(posedge clk ) begin
         if (rst) begin
             selected_data_out = 0; enabled = 0;
         end else begin
@@ -32,7 +32,7 @@ module channel_selecter #(
                 enabled = select;
             end else begin
                 selected_data_out = {256{1'b0}};
-                // enabled = enabled;
+                enabled = enabled;
             end
         end
     end
