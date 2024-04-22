@@ -39,6 +39,7 @@ module fifo_tb ();
         $dumpvars;
     end
 
+    integer i;
     initial begin
         clk <=1; rst <= 0; next_data <= 0;
         wr_sop <= 0; wr_eop <= 0; wr_vld <= 0;
@@ -48,6 +49,24 @@ module fifo_tb ();
         #2;
         rst <= 0;
         #20;
+        wr_sop <=1;
+        #2;
+        wr_sop <= 0;
+        wr_vld <= 1;
+        next_data <= 1;
+        for (i=0; i<fifo_length-1; i=i+1) begin
+            wr_data <= $random;
+            #2;
+        end
+        wr_eop <= 1;
+        #2;
+        wr_eop <= 0;
+        wr_vld <= 0;
+        #20;
+        next_data <= 1;
+        #64;
+        next_data <= 0;
+        #10;
         $finish;
     end
 
