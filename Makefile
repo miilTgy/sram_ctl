@@ -46,7 +46,7 @@ run: $(OBJ_DIR)/V$(MOD_NAME)
 	$(OBJ_DIR)/V$(MOD_NAME)
 
 show: dump.vcd
-	gtkwave dump.vcd
+	gtkwave dump.vcd &
 
 wave: all run show
 
@@ -63,7 +63,7 @@ irun: ./a.out
 	./a.out
 
 ishow: ./waveform.vcd
-	gtkwave waveform.vcd
+	gtkwave waveform.vcd &
 
 iwave: itest irun ishow
 
