@@ -16,7 +16,7 @@ module arbiter_core # (
     wire [2:0] priorities [num_of_ports-1:0];
     reg [2:0] bigger;
     reg [3:0] select_tmp;
-    wire busy;
+    reg busy;
     integer j;
 
     // unzip priority_in
@@ -27,11 +27,10 @@ module arbiter_core # (
         end
     endgenerate
 
-    assign busy = |ready; // TODO: busy要在ready信号出现的延后一个周期才变，为了与fifo进行时序配合
-
     always @(posedge clk ) begin
         if (rst) begin
             select = 4'b0000; select_tmp = 4'b0000; transfering = 1'b0;
+            busy = 1'b0;
         end else if (busy && (!transfering)) begin
             if (sp0_wrr1) begin // wrr
                 bigger = bigger;
@@ -51,8 +50,8 @@ module arbiter_core # (
             end
         end else if (transfering && eop[select]) begin
             transfering = 1'b0;
-        end else begin
-            bigger = bigger;
+        end else if (!busy) begin
+            busy = | ready;
         end
     end
     
