@@ -1,3 +1,4 @@
+# Created and maintanced by Zeng GuangYi(miil)
 MOD_NAME = channel_selecter
 
 MOD_PATH = src
