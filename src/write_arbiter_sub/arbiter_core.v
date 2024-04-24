@@ -10,13 +10,13 @@ module arbiter_core # (
     input           [num_of_ports-1:0]      eop,
     input           [num_of_ports*3-1:0]    priority_in,
     output  reg     [3:0]                   select,
-    output  reg                             transfering
+    output  reg                             transfering,
+    output  reg                             busy
 );
 
     wire [2:0] priorities [num_of_ports-1:0];
     reg [2:0] bigger;
     reg [3:0] select_tmp;
-    reg busy;
     integer j;
 
     // unzip priority_in
@@ -52,6 +52,9 @@ module arbiter_core # (
             transfering = 1'b0;
         end else if (!busy) begin
             busy = | ready;
+        end
+        if (busy && (| eop)) begin
+            busy = 1'b0;
         end
     end
     
