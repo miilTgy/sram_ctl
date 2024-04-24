@@ -82,7 +82,7 @@ srun: ./a.out
 	./a.out
 
 sshow: ./waveform.vcd
-	gtkwave waveform.vcd
+	gtkwave waveform.vcd &
 
 swave: stest srun sshow
 
