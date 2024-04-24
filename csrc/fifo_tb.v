@@ -53,8 +53,10 @@ module fifo_tb ();
         #2;
         wr_sop <= 0;
         wr_vld <= 1;
-        next_data <= 1;
         for (i=0; i<fifo_length-1; i=i+1) begin
+            if (ready) begin
+                next_data <= 1'b1;
+            end
             wr_data <= $random;
             #2;
         end
