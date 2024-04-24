@@ -1,7 +1,7 @@
-集创赛仓库
-activated 曾广翼
-activated 周俊熹
-activated 陈光鉴
+# 集创赛仓库
+activated 曾广翼  
+activated 周俊熹  
+activated 陈光鉴  
 
 使用：
   make check [MOD_NAME=你想检查的文件名]
