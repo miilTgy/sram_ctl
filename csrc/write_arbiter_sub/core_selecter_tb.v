@@ -18,19 +18,18 @@ module core_selecter_tb ();
     reg [2:0] priorities [num_of_ports-1:0];
 
     //ports for selecter
-    reg enable;
     // reg [3:0] select;
-    wire [(arbiter_data_width*num_of_ports)-1:0] selected_data_in;
+    reg [(arbiter_data_width*num_of_ports)-1:0] selected_data_in;
     wire [arbiter_data_width-1:0] selected_data_out;
     wire [3:0] enabled;
     // unpacked selected_data_in
-    reg [arbiter_data_width-1:0] datas [num_of_ports-1:0];
+    wire [arbiter_data_width-1:0] datas [num_of_ports-1:0];
 
     // 解压缩selected_data_in和priority_in
     genvar j;
     generate
         for (j=0; j<num_of_ports; j=j+1) begin
-            assign selected_data_in[(j+1)*arbiter_data_width-1:j*arbiter_data_width] = datas[j];
+            assign datas[j] = selected_data_in[(j+1)*arbiter_data_width-1:j*arbiter_data_width];
             assign priority_in[(j+1)*3-1:j*3] = priorities[j];
         end
     endgenerate
@@ -50,7 +49,7 @@ module core_selecter_tb ();
     channel_selecter channel_selecter_tt1 (
         .clk                    (clk                ),
         .rst                    (rst                ),
-        .enable                 (enable             ),
+        .enable                 (transfering        ),
         .select                 (select             ),
         .selected_data_in       (selected_data_in   ),
         .selected_data_out      (selected_data_out  ),
@@ -67,15 +66,34 @@ module core_selecter_tb ();
         end
     end
     initial begin
-        clk <= 1; rst <= 0; enable <= 0;
+        clk <= 1; rst <= 0; sp0_wrr1 <= 0;
         for (i=0; i<num_of_ports; i=i+1) begin
-            datas[i] <= 0;
             priorities[i] <= 0;
+            eop[i] <= 0;
+            ready[i] <= 0;
+        end
+        for (i=0; i<4096; i=i+1) begin
+            selected_data_in[i] <= 1'b0;
         end
         #2;
         rst <= 1;
         #2;
         rst <= 0;
+        #10;
+        for (i=0; i<num_of_ports; i=i+1) begin
+            ready[i] <= $random;
+            priorities[i] <= {$random}%8;
+        end
+        for (i=0; i<4096; i=i+1) begin
+            selected_data_in[i] <= $random;
+        end
+        #8;
+        eop[select] <= 1;
+        #2;
+        eop[select] <= 0;
+        for (i=0; i<num_of_ports; i=i+1) begin
+            ready[i] <= 0;
+        end
         #10;
         $finish;
     end
