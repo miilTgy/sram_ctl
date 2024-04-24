@@ -22,7 +22,7 @@ module core_selecter_tb ();
     // reg [3:0] select;
     wire [(arbiter_data_width*num_of_ports)-1:0] selected_data_in;
     wire [arbiter_data_width-1:0] selected_data_out;
-    wire enabled;
+    wire [3:0] enabled;
     // unpacked selected_data_in
     reg [arbiter_data_width-1:0] datas [num_of_ports-1:0];
 
@@ -72,7 +72,12 @@ module core_selecter_tb ();
             datas[i] <= 0;
             priorities[i] <= 0;
         end
+        #2;
+        rst <= 1;
+        #2;
+        rst <= 0;
         #10;
+        $finish;
     end
 
 endmodule
