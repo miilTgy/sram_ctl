@@ -70,4 +70,20 @@ iwave: itest irun ishow
 iclean: a.out
 	rm a.out
 
-.PHONY: default check build clean run show wave ibuild itest irun ishow iwave
+SUB_MOD = $(shell find $(abspath $(MOD_PATH)/write_arbiter_sub) -name *.v)
+sbuild: $(SUB_MOD)
+	$(IVERILOG) $(SUB_MOD)
+
+SUB_TB = $(shell find $(abspath $(TB_PATH)/write_arbiter_sub) -name core*.v)
+stest: $(SUB_MOD) $(SUB_TB)
+	rm a.out; $(IVERILOG) $(SUB_TB) $(SUB_MOD)
+
+srun: ./a.out
+	./a.out
+
+sshow: ./waveform.vcd
+	gtkwave waveform.vcd
+
+swave: stest srun sshow
+
+.PHONY: default check build clean run show wave ibuild itest irun ishow iwave sbuild stest srun sshow swave
