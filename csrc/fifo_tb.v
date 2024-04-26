@@ -60,6 +60,7 @@ module fifo_tb ();
             wr_data <= $random;
             #2;
         end
+        wr_data <= 0;
         wr_eop <= 1;
         #2;
         wr_eop <= 0;

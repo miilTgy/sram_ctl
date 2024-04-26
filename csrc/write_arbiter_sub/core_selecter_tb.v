@@ -82,10 +82,14 @@ module core_selecter_tb ();
         #10;
         for (i=0; i<num_of_ports; i=i+1) begin
             ready[i] <= $random;
-            priorities[i] <= {$random}%8;
+            // priorities[i] <= {$random}%8;
         end
         for (i=0; i<4096; i=i+1) begin
             selected_data_in[i] <= $random;
+        end
+        #2;
+        for (i=0; i<num_of_ports; i=i+1) begin
+            priorities[i] <= {$random}%8;
         end
         #8;
         eop[select] <= 1;
