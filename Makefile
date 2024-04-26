@@ -1,4 +1,4 @@
-MOD_NAME = fifo
+MOD_NAME = priority_decoder
 
 MOD_PATH = src
 TB_PATH = csrc
