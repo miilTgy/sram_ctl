@@ -12,7 +12,7 @@ module write_arbiter #(
     input           [num_of_ports-1:0]                          sop,
     input           [num_of_ports-1:0]                          eop,
     input           [num_of_ports-1:0]                          vld,
-    input   wire    [(num_of_ports * arbiter_data_width)-1:0]   data_in_p,
+    input   wire    [(num_of_ports*sarbiter_data_width)-1:0]    data_in_p,
     output  wire                                                busy,
     output  reg     [(arbiter_data_width)-1:0]                  selected_data_out,
     output  reg     [num_of_ports-1:0]                          next_data
