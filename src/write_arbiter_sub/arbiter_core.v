@@ -1,17 +1,18 @@
 module arbiter_core # (
     // parameters
-    parameter num_of_ports = 16
+    parameter num_of_ports = 16,
+    parameter priority_width = 3
 ) (
     // port
-    input                                   clk,
-    input                                   rst,
-    input                                   sp0_wrr1,
-    input           [num_of_ports-1:0]      ready,
-    input           [num_of_ports-1:0]      eop,
-    input           [num_of_ports*3-1:0]    priority_in,
-    output  reg     [3:0]                   select,
-    output  reg                             transfering,
-    output  reg                             busy
+    input                                           clk,
+    input                                           rst,
+    input                                           sp0_wrr1,
+    input       [num_of_ports-1:0]                  ready,
+    input       [num_of_ports-1:0]                  eop,
+    input       [num_of_ports*priority_width-1:0]   priority_in,
+    output  reg [3:0]                               select,
+    output  reg                                     transfering,
+    output  reg                                     busy
 );
 
     wire [2:0] priorities [num_of_ports-1:0];
