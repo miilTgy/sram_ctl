@@ -37,7 +37,7 @@ module priority_decoder #(
             if ((| ready) && (! holding)) begin
                 for (i=0; i<num_of_ports; i=i+1) begin
                     // 这里运用了一个新语法：signal[i+:n]表示从i位开始往上取n位。
-                    priority_out[i*priority_width+:priority_width] <= priorities[i];
+                    priority_out[i*priority_width +: priority_width] <= priorities[i];
                     holding <= 1'b1;
                 end
             end else if (holding && eop[select]) begin
