@@ -11,7 +11,9 @@ module priority_decoder #(
     input       [num_of_ports-1:0]                      ready,
     input       [num_of_ports-1:0]                      eop,
     input       [3:0]                                   select,
-    output  reg [num_of_ports*priority_width-1:0]       priority_out
+    output  reg [num_of_ports*priority_width-1:0]       priority_out,
+    output  reg [num_of_ports*priority_width-1:0]       pre_priority_out
+
 );
 
     wire [arbiter_data_width-1:0] priorities_tmp [num_of_ports-1:0];
@@ -44,6 +46,12 @@ module priority_decoder #(
                 holding <= 1'b0;
                 priority_out <= {num_of_ports*priority_width{1'b0}};
             end
+        end
+    end
+
+    always @(* ) begin
+        for (i=0; i<num_of_ports; i=i+1) begin
+            pre_priority_out[i*priority_width +: priority_width] <= priorities[i];
         end
     end
 
