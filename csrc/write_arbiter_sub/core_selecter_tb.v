@@ -12,10 +12,14 @@ module core_selecter_tb ();
     reg [num_of_ports-1:0] ready;
     reg [num_of_ports-1:0] eop;
     wire [num_of_ports*3-1:0] priority_in;
+    wire [num_of_ports*3-1:0] pre_priority_in;
     // wire [3:0] select;
     wire transfering;
+    wire busy;
+    wire [num_of_ports-1:0] next_data;
     // unpacked priority_in
     reg [2:0] priorities [num_of_ports-1:0];
+    reg [2:0] pre_priorities [num_of_ports-1:0];
 
     //ports for selecter
     // reg [3:0] select;
@@ -31,6 +35,7 @@ module core_selecter_tb ();
         for (j=0; j<num_of_ports; j=j+1) begin
             assign datas[j] = selected_data_in[(j+1)*arbiter_data_width-1:j*arbiter_data_width];
             assign priority_in[(j+1)*3-1:j*3] = priorities[j];
+            assign pre_priority_in[(j+1)*3-1:j*3] = pre_priorities[j];
         end
     endgenerate
 
@@ -42,8 +47,11 @@ module core_selecter_tb ();
         .ready                  (ready              ),
         .eop                    (eop                ),
         .priority_in            (priority_in        ),
+        .pre_priority_in        (pre_priority_in    ),
         .select                 (select             ),
-        .transfering            (transfering        )
+        .next_data              (next_data          ),
+        .transfering            (transfering        ),
+        .busy                   (busy               )
     );
 
     channel_selecter channel_selecter_tt1 (
@@ -82,14 +90,14 @@ module core_selecter_tb ();
         #10;
         for (i=0; i<num_of_ports; i=i+1) begin
             ready[i] <= $random;
-            // priorities[i] <= {$random}%8;
+            pre_priorities[i] <= {$random}%8;
         end
         for (i=0; i<4096; i=i+1) begin
             selected_data_in[i] <= $random;
         end
         #2;
         for (i=0; i<num_of_ports; i=i+1) begin
-            priorities[i] <= {$random}%8;
+            priorities[i] <= pre_priorities[i];
         end
         #8;
         eop[select] <= 1;
