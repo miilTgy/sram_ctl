@@ -2,7 +2,8 @@
 module write_arbiter #(
     // parameters
     parameter num_of_ports = 16,
-    parameter arbiter_data_width = 256
+    parameter arbiter_data_width = 256,
+    parameter priority_width = 3;
 ) (
     // ports
     input                                                       rst,
@@ -18,7 +19,9 @@ module write_arbiter #(
     output  reg     [num_of_ports-1:0]                          next_data
 );
 
-    wire    [arbiter_data_width-1:0]    selected_data_in    [num_of_ports-1:0];
+    wire    [arbiter_data_width-1:0]            selected_data_in    [num_of_ports-1:0];
+    wire    [num_of_ports*priority_width-1:0]   priority_in;
+    wire    [3:0]                               select;
 
     // 压缩data_in_p端口
     genvar i;
