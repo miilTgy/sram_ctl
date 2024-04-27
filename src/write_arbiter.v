@@ -31,5 +31,26 @@ module write_arbiter #(
         end
     endgenerate
 
+    // instance
+    arbiter_core arbiter_core_write (
+        .clk                        (clk),
+        .rst                        (rst),
+        .sp0_wrr1                   (sp0_wrr1),
+        .ready                      (ready),
+        .eop                        (eop),
+        .priority_in                (priority_in),
+        .select                     (select),
+        .transfering                (transfering),
+        .busy                       (busy)
+    );
     
+    priority_decoder priority_decoder_write (
+        .clk                        (clk),
+        .rst                        (rst),
+        .priority_decoder_in        (data_in_p),
+        .ready                      (ready),
+        .eop                        (eop),
+        .select                     (select),
+        .priority_out               (priority_in)
+    );
 endmodule
