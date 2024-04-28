@@ -49,7 +49,7 @@ module write_arbiter_tb ();
         data_in_p <= 0;
         #2;
         rst <= 1;
-        #2
+        #2;
         rst <= 0;
         #10;
         $finish;
