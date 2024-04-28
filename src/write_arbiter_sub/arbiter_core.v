@@ -46,7 +46,7 @@ module arbiter_core # (
                 select_tmp = 4'b0;
                 bigger = 3'b0;
                 for (j = 0; j<num_of_ports; j = j + 1) begin
-                    if (ready[j]) begin
+                    if (ready[j]) begin  // arbit
                         if (priorities[j] > bigger) begin
                             bigger = priorities[j];
                             select_tmp = j[3:0];
