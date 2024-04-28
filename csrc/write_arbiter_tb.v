@@ -45,11 +45,13 @@ module write_arbiter_tb ();
     end
     initial begin
         rst <= 0; sp0_wrr1 <= 0; clk <= 1'b1;
-        #10
+        ready <= 0; sop <= 0; eop <= 0; vld <= 0;
+        data_in_p <= 0;
+        #2;
         rst <= 1;
         #2
         rst <= 0;
-        #10
+        #10;
         $finish;
     end
     
