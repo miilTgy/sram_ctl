@@ -12,12 +12,30 @@ module write_arbiter_tb ();
     reg [(arbiter_data_width * num_of_ports)-1:0] data_in_p;
     wire [arbiter_data_width-1:0] selected_data_out;
 
-    write_arbiter arbiter_test (
-        .rst        (rst        ),
-        .clk        (clk        ),
-        .sp0_wrr1   (sp0_wrr1   ),
-        .data_in_p  (data_in    ),
-        .data_out   (data_out   )
+    // unpacked ports
+    wire [arbiter_data_width-1:0] data_in [num_of_ports-1:0];
+
+    // unpack ports
+    genvar j;
+    generate
+        for (j=0; j<num_of_ports; j=j+1) begin
+            assign data_in[j] = data_in_p[(j+1)*arbiter_data_width-1:j*arbiter_data_width];
+        end
+    endgenerate
+
+    // instance
+    write_arbiter arbiter_tt (
+        .rst                        (rst                ),
+        .clk                        (clk                ),
+        .sp0_wrr1                   (sp0_wrr1           ),
+        .ready                      (ready              ),
+        .sop                        (sop                ),
+        .eop                        (eop                ),
+        .vld                        (vld                ),
+        .data_in_p                  (data_in_p          ),
+        .busy                       (busy               ),
+        .selected_data_out          (selected_data_out  ),
+        .next_data                  (next_data          )
     );
 
     always #1 clk = ~clk;
