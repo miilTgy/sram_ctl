@@ -1,9 +1,9 @@
 // `define num_of_ports 16
 module write_arbiter #(
     // parameters
-    parameter num_of_ports = 16,
+    parameter num_of_ports       = 16,
     parameter arbiter_data_width = 256,
-    parameter priority_width = 3;
+    parameter priority_width     = 3
 ) (
     // ports
     input                                                       rst,
@@ -13,14 +13,15 @@ module write_arbiter #(
     input           [num_of_ports-1:0]                          sop,
     input           [num_of_ports-1:0]                          eop,
     input           [num_of_ports-1:0]                          vld,
-    input   wire    [(num_of_ports*sarbiter_data_width)-1:0]    data_in_p,
+    input   wire    [(num_of_ports*arbiter_data_width)-1:0]     data_in_p,
     output  wire                                                busy,
-    output  reg     [(arbiter_data_width)-1:0]                  selected_data_out,
-    output  reg     [num_of_ports-1:0]                          next_data
+    output  wire    [(arbiter_data_width)-1:0]                  selected_data_out,
+    output  wire    [num_of_ports-1:0]                          next_data
 );
 
-    wire    [arbiter_data_width-1:0]            selected_data_in    [num_of_ports-1:0];
+    wire    [arbiter_data_width-1:0]            data_in             [num_of_ports-1:0];
     wire    [num_of_ports*priority_width-1:0]   priority_in;
+    wire    [num_of_ports*priority_width-1:0]   pre_priority_in;
     wire    [3:0]                               select;
 
     // 压缩data_in_p端口
@@ -33,24 +34,38 @@ module write_arbiter #(
 
     // instance
     arbiter_core arbiter_core_write (
-        .clk                        (clk),
-        .rst                        (rst),
-        .sp0_wrr1                   (sp0_wrr1),
-        .ready                      (ready),
-        .eop                        (eop),
-        .priority_in                (priority_in),
-        .select                     (select),
-        .transfering                (transfering),
-        .busy                       (busy)
+        .clk                        (clk                ),
+        .rst                        (rst                ),
+        .sp0_wrr1                   (sp0_wrr1           ),
+        .ready                      (ready              ),
+        .eop                        (eop                ),
+        .priority_in                (priority_in        ),
+        .pre_priority_in            (pre_priority_in    ),
+        .select                     (select             ),
+        .next_data                  (next_data          ),
+        .transfering                (transfering        ),
+        .busy                       (busy               )
     );
     
     priority_decoder priority_decoder_write (
-        .clk                        (clk),
-        .rst                        (rst),
-        .priority_decoder_in        (data_in_p),
-        .ready                      (ready),
-        .eop                        (eop),
-        .select                     (select),
-        .priority_out               (priority_in)
+        .clk                        (clk                ),
+        .rst                        (rst                ),
+        .priority_decoder_in        (data_in_p          ),
+        .ready                      (ready              ),
+        .eop                        (eop                ),
+        .select                     (select             ),
+        .priority_out               (priority_in        ),
+        .pre_priority_out           (pre_priority_in    )
     );
+
+    channel_selecter channel_selecter_write (
+        .clk                        (clk                ),
+        .rst                        (rst                ),
+        .enable                     (transfering        ),
+        .select                     (select             ),
+        .selected_data_in           (data_in_p          ),
+        .selected_data_out          (selected_data_out  ),
+        .enabled                    (                   )
+    );
+
 endmodule
