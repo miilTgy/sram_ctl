@@ -1,11 +1,16 @@
 module write_arbiter_tb ();
 
+    // parameters
     parameter arbiter_data_width = 256;
     parameter num_of_ports = 16;
     
+    // ports
     reg clk, rst, sp0_wrr1;
-    reg [(arbiter_data_width * num_of_ports)-1:0] data_in;
-    wire [arbiter_data_width-1:0] data_out;
+    wire busy;
+    reg [num_of_ports-1:0] ready, sop, eop, vld;
+    wire [num_of_ports-1:0] next_data;
+    reg [(arbiter_data_width * num_of_ports)-1:0] data_in_p;
+    wire [arbiter_data_width-1:0] selected_data_out;
 
     write_arbiter arbiter_test (
         .rst        (rst        ),
