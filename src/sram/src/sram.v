@@ -14,11 +14,10 @@ reg [63:0] memory [0:31][0:4095];
 always @(posedge clk) begin
     if (rst) begin
         data_out <= 64'h0; // 复位时，输出全零
-    end else begin
-        if (write_en) begin
-            memory[address[4:0]][address[22:5]] <= data_in; // 写入数据
-        end
-        data_out <= memory[address[4:0]][address[22:5]]; // 读出数据
+    end 
+    else begin
+        if (write_en)memory[address[4:0]][address[22:5]] <= data_in; // 写入数据
+        else data_out <= memory[address[4:0]][address[22:5]];        // 读出数据
     end
 end
 
