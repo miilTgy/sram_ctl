@@ -26,14 +26,14 @@ module fifo #(
     reg working;
     integer i=32'b0;
 
-    reg [2:0] clk_sync;
-    wire sampling;
+    // reg [2:0] clk_sync;
+    // wire sampling;
 
-    assign sampling = (!clk_sync[2] & clk_sync[1]); // detact posedge of input clock;
+    // assign sampling = (!clk_sync[2] & clk_sync[1]); // detact posedge of input clock;
 
-    always @(posedge clk ) begin
-        clk_sync <= {clk_sync[1:0], in_clk};
-    end
+    // always @(posedge clk ) begin
+    //     clk_sync <= {clk_sync[1:0], in_clk};
+    // end
 
     always @(posedge clk ) begin
         if (rst) begin
@@ -51,20 +51,37 @@ module fifo #(
                     end
                 end
             end
-            //write in
-            if (wr_sop) begin
-                working <= 1'b1;
-            end
-            if (wr_eop) begin
-                working <= 1'b0;
-                fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, {fifo_data_width{1'b0}}};
-            end
-            if (working && wr_vld) begin
-                fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, wr_data};
-                wptr <= wptr + 5'b1;
-                ready <= 1'b1;
-                overflow <= overflow | (rptr == (wptr+5'b1)); // if wptr catch up with rptr, overflow
-            end
+            // //write in
+            // if (wr_sop) begin
+            //     working <= 1'b1;
+            // end
+            // if (wr_eop) begin
+            //     working <= 1'b0;
+            //     fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, {fifo_data_width{1'b0}}};
+            // end
+            // if (working && wr_vld) begin
+            //     fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, wr_data};
+            //     wptr <= wptr + 5'b1;
+            //     ready <= 1'b1;
+            //     overflow <= overflow | (rptr == (wptr+5'b1)); // if wptr catch up with rptr, overflow
+            // end
+        end
+    end
+
+    always @(posedge in_clk ) begin
+        //write in
+        if (wr_sop) begin
+            working <= 1'b1;
+        end
+        if (wr_eop) begin
+            working <= 1'b0;
+            fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, {fifo_data_width{1'b0}}};
+        end
+        if (working && wr_vld) begin
+            fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, wr_data};
+            wptr <= wptr + 5'b1;
+            ready <= 1'b1;
+            overflow <= overflow | (rptr == (wptr+5'b1)); // if wptr catch up with rptr, overflow
         end
     end
 

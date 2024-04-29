@@ -5,6 +5,7 @@ module fifo_tb ();
 
     reg                         rst;
     reg                         clk;
+    reg                         in_clk;
     reg                         next_data;
     reg                         wr_sop;
     reg                         wr_eop;
@@ -19,6 +20,7 @@ module fifo_tb ();
 
     fifo fifo_tt (
         .rst            (rst        ),
+        .in_clk         (in_clk     ),
         .clk            (clk        ),
         .next_data      (next_data  ),
         .wr_sop         (wr_sop     ),
@@ -34,6 +36,7 @@ module fifo_tb ();
     );
 
     always #1 clk = ~clk;
+    always #16 in_clk = ~in_clk;
     initial begin
         $dumpfile("waveform.vcd");
         $dumpvars;
@@ -41,35 +44,36 @@ module fifo_tb ();
 
     integer i;
     initial begin
-        clk <=1; rst <= 0; next_data <= 0;
+        clk <=1; rst <= 0; next_data <= 0; in_clk <= 1;
         wr_sop <= 0; wr_eop <= 0; wr_vld <= 0;
         wr_data <= 0;
-        #2;
+        #32;
         rst <= 1;
-        #2;
+        #32;
         rst <= 0;
-        #20;
+        #320;
         wr_sop <=1;
-        #2;
+        #32;
         wr_sop <= 0;
         wr_vld <= 1;
         for (i=0; i<fifo_length-1; i=i+1) begin
-            if (ready) begin
-                next_data <= 1'b1;
-            end
             wr_data <= $random;
             #2;
+            next_data <= 1;
+            #2;
+            next_data <= 0;
+            #28;
         end
         wr_data <= 0;
         wr_eop <= 1;
-        #2;
+        #32;
         wr_eop <= 0;
         wr_vld <= 0;
-        #20;
+        #320;
         next_data <= 1;
-        #64;
+        #640;
         next_data <= 0;
-        #10;
+        #160;
         $finish;
     end
 
