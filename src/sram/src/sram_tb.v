@@ -9,7 +9,7 @@ reg rst;
 // 写入数据信号
 reg [63:0] data_in;
 // 地址信号
-reg [22:0] address;
+reg [24:0] address;
 // 写使能信号
 reg write_en;
 // 读出数据信号
@@ -34,14 +34,14 @@ wire [63:0] data_out;
             // 写入数据到各个单元
         for (i = 0; i < 32; i = i + 1) begin : write_data
             #10 write_en = 1;
-            #10 address = {18'b0,i};
+            #10 address = {20'b0,i};
             #10 data_in = 64'h1122334455667788; // 假设每个单元写入的数据不同
             #10 write_en = 0;
         end
 
         // 读出数据
         for (i = 0; i < 32; i = i + 1) begin : read_data
-            #10 address = {18'b0,i};
+            #10 address = {20'b0,i};
             #10 write_en = 0;
         end
 
