@@ -2,3 +2,4 @@
 build/
 *.vcd
 *.out
+*.DS_Store
