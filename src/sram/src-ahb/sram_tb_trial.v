@@ -1,4 +1,5 @@
-`timescale 1ns/1ns
+`timescale 1ns/100ps
+`include "sramc_top.v"
 
 module sram_tb_trial();
 

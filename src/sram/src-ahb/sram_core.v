@@ -5,6 +5,7 @@
 //                8 BIST blocks for each sram. DFT testmode is added in each    
 //                of all the 8 srams.                                          
 //============================================================================
+`include "sram_bist.v"
 
 module sram_core(
   //input signals

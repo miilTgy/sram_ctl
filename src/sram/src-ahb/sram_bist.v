@@ -6,6 +6,8 @@
 //  Modify      : Modify the clk, when BIST or DFT not word,		          
 //		            the BIST logic has no clock.			     	                                                         
 //============================================================================
+`include "mbist_8kx8.v"
+`include "RA1SH.v"
 
 module sram_bist(
   //input signals
