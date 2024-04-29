@@ -1,4 +1,4 @@
-MOD_NAME = write_arbiter
+MOD_NAME = fifo
 
 MOD_PATH = src
 TB_PATH = csrc
