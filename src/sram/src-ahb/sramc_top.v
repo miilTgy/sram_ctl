@@ -6,9 +6,6 @@
 //============================================================================
 `include "ahb_slave_if.v"
 `include "sram_core.v"
-`include "sram_bist.v"
-`include "RA1SH.v"
-`include "mbist_8kx8.v"
 
 module sramc_top(
   //input signals
