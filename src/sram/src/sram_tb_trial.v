@@ -1,4 +1,10 @@
 `timescale 1ns/100ps
+`include "sramc_top.v" 
+`include "sram_core.v" 
+`include "sram_bist.v" 
+`include "ahb_slave_if.v"
+`include "RA1SH.v"
+`include "mbist_8kx8.v"
 
 module sram_tb_trial();
 

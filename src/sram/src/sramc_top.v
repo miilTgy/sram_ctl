@@ -4,6 +4,11 @@
 //                It contains two modules:ahb_slave_if.v,sram_core.v .        
 //                The sram_core.v has BIST and DFT function.
 //============================================================================
+`include "ahb_slave_if.v"
+`include "sram_core.v"
+`include "sram_bist.v"
+`include "RA1SH.v"
+`include "mbist_8kx8.v"
 
 module sramc_top(
   //input signals
