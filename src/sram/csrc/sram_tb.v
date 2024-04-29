@@ -2,6 +2,7 @@
 `include "sram_core.v" 
 `include "sram_bist.v" 
 `include "ahb_slave_if.v"
+`timescale 1ns/100ps
 
 module sram_tb(); // no port
 
