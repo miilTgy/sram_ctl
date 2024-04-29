@@ -6,6 +6,7 @@ module fifo #(
     ) (
         // ports
         input                               rst,
+        input                               in_clk,
         input                               clk,
         input                               next_data,
         input                               wr_sop,
@@ -24,6 +25,15 @@ module fifo #(
     reg [4:0] wptr, rptr;
     reg working;
     integer i=32'b0;
+
+    reg [2:0] clk_sync;
+    wire sampling;
+
+    assign sampling = (!clk_sync[2] & clk_sync[1]); // detact posedge of input clock;
+
+    always @(posedge clk ) begin
+        clk_sync <= {clk_sync[1:0], in_clk};
+    end
 
     always @(posedge clk ) begin
         if (rst) begin
