@@ -1,10 +1,10 @@
-# Created and maintanced by Zeng GuangYi(miil)
-MOD_NAME = channel_selecter
+MOD_NAME = write_arbiter
 
 MOD_PATH = src
 TB_PATH = csrc
 
 MOD = $(shell find $(abspath $(MOD_PATH)) -name $(MOD_NAME).v)
+MOD += $(shell find $(abspath $(MOD_PATH)/$(MOD_NAME)_sub) -name *.v)
 iMOD = $(MOD)
 TB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.cpp)
 iTB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.v)
@@ -47,7 +47,7 @@ run: $(OBJ_DIR)/V$(MOD_NAME)
 	$(OBJ_DIR)/V$(MOD_NAME)
 
 show: dump.vcd
-	gtkwave dump.vcd
+	gtkwave dump.vcd &
 
 wave: all run show
 
@@ -64,11 +64,27 @@ irun: ./a.out
 	./a.out
 
 ishow: ./waveform.vcd
-	gtkwave waveform.vcd
+	gtkwave waveform.vcd &
 
 iwave: itest irun ishow
 
 iclean: a.out
 	rm a.out
 
-.PHONY: default check build clean run show wave ibuild itest irun ishow iwave
+SUB_MOD = $(shell find $(abspath $(MOD_PATH)/write_arbiter_sub) -name *.v)
+sbuild: $(SUB_MOD)
+	$(IVERILOG) $(SUB_MOD)
+
+SUB_TB = $(shell find $(abspath $(TB_PATH)/write_arbiter_sub) -name core*.v)
+stest: $(SUB_MOD) $(SUB_TB)
+	rm a.out; $(IVERILOG) $(SUB_TB) $(SUB_MOD)
+
+srun: ./a.out
+	./a.out
+
+sshow: ./waveform.vcd
+	gtkwave waveform.vcd &
+
+swave: stest srun sshow
+
+.PHONY: default check build clean run show wave ibuild itest irun ishow iwave sbuild stest srun sshow swave
