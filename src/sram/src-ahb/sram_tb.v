@@ -1,7 +1,5 @@
 `include "sramc_top.v" 
-`include "sram_core.v" 
-`include "sram_bist.v" 
-`include "ahb_slave_if.v"
+`timescale 1ns/100ps
 
 module sram_tb(); // no port
 
@@ -139,6 +137,15 @@ begin
 	rdata = hrdata;
 end
 endtask
+
+/*iverilog */
+initial
+begin            
+    $dumpfile("wave.vcd");        //生成的vcd文件名称
+    $dumpvars(0, sram_tb);     //tb模块名称
+end
+/*iverilog */
+
 
 endmodule
 
