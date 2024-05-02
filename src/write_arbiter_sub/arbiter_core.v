@@ -39,7 +39,7 @@ module arbiter_core # (
             select = 4'b0000; select_tmp = 4'b0000; transfering = 1'b0;
             pre_select_tmp = 4'b0000;
             busy = 1'b0; next_data = {num_of_ports{1'b0}};
-        end else if (busy && (!transfering)) begin
+        end else if (busy && (!transfering)) begin // 第二拍进入此分支，并开始传输数据
             if (sp0_wrr1) begin // wrr
                 bigger = bigger;
             end else begin      // sp
@@ -56,9 +56,9 @@ module arbiter_core # (
                 select = select_tmp;
                 transfering = 1'b1;
             end
-        end else if (transfering && eop[select]) begin
+        end else if (transfering && eop[select]) begin // 传输过程中eop进来的同时进入此分支
             transfering = 1'b0;
-        end else if (!busy) begin
+        end else if (!busy) begin // 第一拍数据进来的同时进入此分支
             busy = | ready;
             pre_select_tmp = 4'b0;
             pre_bigger = 3'b0;
