@@ -58,18 +58,14 @@ module fifo_tb ();
         wr_vld <= 1;
         for (i=0; i<fifo_length-1; i=i+1) begin
             wr_data <= $random;
-            #2;
-            next_data <= 1;
-            #2;
-            next_data <= 0;
-            #28;
+            #32;
         end
         wr_data <= 0;
         wr_eop <= 1;
         #32;
         wr_eop <= 0;
         wr_vld <= 0;
-        #320;
+        #2;
         next_data <= 1;
         #640;
         next_data <= 0;
