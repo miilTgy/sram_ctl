@@ -3,3 +3,4 @@ build/
 *.vcd
 *.out
 .DS_Store
+wave
