@@ -72,3 +72,8 @@ iclean: a.out
 	rm a.out
 
 .PHONY: default check build clean run show wave ibuild itest irun ishow iwave
+
+sram:
+	iverilog -o wave ./src/sram_testbench.v ./src/sram/sim/blk_mem_gen_0.v ./src/sram/simulation/blk_mem_gen_v8_4.v
+	vvp -n wave -lxt2
+	gtkwave wave.vcd
