@@ -1,8 +1,9 @@
 module fifo #(
         // parameters
-        parameter fifo_data_width      = 16,   // should be 256
+        parameter fifo_data_width      = 64,   // should be 256
         parameter fifo_num_of_priority = 8,
-        parameter fifo_length = 32
+        parameter fifo_length = 32,
+        parameter fifo_pointer_width = 5
     ) (
         // ports
         input                               rst,
@@ -22,7 +23,7 @@ module fifo #(
     );
 
     reg [fifo_data_width-1+3:0] fifo_buf [fifo_length-1:0];
-    reg [4:0] wptr, rptr;
+    reg [fifo_pointer_width-1:0] wptr, rptr;
     reg working;
     integer i=32'b0;
 
@@ -37,16 +38,16 @@ module fifo #(
 
     always @(posedge clk ) begin
         if (rst) begin
-            wptr <= 5'b0; rptr <= 5'b0; working <= 1'b0;
+            wptr <= 0; rptr <= 0; working <= 1'b0; ready <= 1'b0;
             for (i = 32'b0; i < fifo_num_of_priority; i++) begin
-                fifo_buf[i] <= fifo_buf[i] ^ fifo_buf[i];
+                fifo_buf[i] <= 0;
             end
         end else begin
             // read out
             if (ready) begin
                 if (next_data) begin
-                    rptr <= rptr + 5'b1;
-                    if (wptr == rptr+5'b1) begin // if fifo_buf empty
+                    rptr <= rptr + {{(fifo_pointer_width-1){1'b0}}, 1'b1};
+                    if (wptr == rptr+{{(fifo_pointer_width-1){1'b0}}, 1'b1}) begin // if fifo_buf empty
                         ready <= 1'b0; // reset ready
                     end
                 end
@@ -75,13 +76,13 @@ module fifo #(
         end
         if (wr_eop) begin
             working <= 1'b0;
+            ready <= 1'b1;
             fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, {fifo_data_width{1'b0}}};
         end
         if (working && wr_vld) begin
             fifo_buf[wptr] <= {wr_sop, wr_eop, wr_vld, wr_data};
-            wptr <= wptr + 5'b1;
-            ready <= 1'b1;
-            overflow <= overflow | (rptr == (wptr+5'b1)); // if wptr catch up with rptr, overflow
+            wptr <= wptr + {{(fifo_pointer_width-1){1'b0}}, 1'b1};
+            overflow <= overflow | (rptr == (wptr+{{(fifo_pointer_width-1){1'b0}}, 1'b1})); // if wptr catch up with rptr, overflow
         end
     end
 
