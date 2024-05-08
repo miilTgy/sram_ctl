@@ -1,6 +1,6 @@
 module fifo #(
         // parameters
-        parameter fifo_data_width      = 64,   // should be 256
+        parameter fifo_data_width      = 64,   // should be 64
         parameter fifo_num_of_priority = 8,
         parameter fifo_length = 32,
         parameter fifo_pointer_width = 5
