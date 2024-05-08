@@ -1,7 +1,7 @@
 module channel_selecter #(
     // parameters
     parameter num_of_ports = 16,
-    parameter arbiter_data_width = 256
+    parameter arbiter_data_width = 64
 ) (
     // ports
     input                                                   clk,

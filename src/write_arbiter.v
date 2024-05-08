@@ -2,7 +2,7 @@
 module write_arbiter #(
     // parameters
     parameter num_of_ports       = 16,
-    parameter arbiter_data_width = 256,
+    parameter arbiter_data_width = 64,
     parameter priority_width     = 3
 ) (
     // ports

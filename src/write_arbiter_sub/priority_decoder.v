@@ -1,6 +1,6 @@
 module priority_decoder #(
     // parameters
-    parameter arbiter_data_width = 256,
+    parameter arbiter_data_width = 64,
     parameter num_of_ports       = 16,
     parameter priority_width     = 3
 ) (
