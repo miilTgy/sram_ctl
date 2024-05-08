@@ -1,5 +1,5 @@
 module fifo_tb ();
-    parameter fifo_data_width = 16;
+    parameter fifo_data_width = 64;
     parameter fifo_num_of_priority = 8;
     parameter fifo_length = 32;
 
@@ -42,7 +42,7 @@ module fifo_tb ();
         $dumpvars;
     end
 
-    integer i;
+    integer i,ij;
     initial begin
         clk <=1; rst <= 0; next_data <= 0; in_clk <= 1;
         wr_sop <= 0; wr_eop <= 0; wr_vld <= 0;
@@ -57,7 +57,9 @@ module fifo_tb ();
         wr_sop <= 0;
         wr_vld <= 1;
         for (i=0; i<fifo_length-1; i=i+1) begin
-            wr_data <= $random;
+            for(ij=0; ij<fifo_data_width; ij=ij+1) begin
+                wr_data[ij] <= $random;
+            end
             #32;
         end
         wr_data <= 0;

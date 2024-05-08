@@ -1,6 +1,6 @@
 module fifo #(
         // parameters
-        parameter fifo_data_width      = 16,   // should be 256
+        parameter fifo_data_width      = 64,   // should be 256
         parameter fifo_num_of_priority = 8,
         parameter fifo_length = 32,
         parameter fifo_pointer_width = 5
@@ -38,9 +38,9 @@ module fifo #(
 
     always @(posedge clk ) begin
         if (rst) begin
-            wptr <= 0; rptr <= 0; working <= 1'b0;
+            wptr <= 0; rptr <= 0; working <= 1'b0; ready <= 1'b0;
             for (i = 32'b0; i < fifo_num_of_priority; i++) begin
-                fifo_buf[i] <= fifo_buf[i] ^ fifo_buf[i];
+                fifo_buf[i] <= 0;
             end
         end else begin
             // read out
