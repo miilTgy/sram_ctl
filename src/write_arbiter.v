@@ -16,14 +16,14 @@ module write_arbiter #(
     input   wire    [(num_of_ports*arbiter_data_width)-1:0]     data_in_p,
     output  wire                                                busy,
     output  wire    [(arbiter_data_width)-1:0]                  selected_data_out,
-    output  wire    [num_of_ports-1:0]                          next_data
+    output  wire    [num_of_ports-1:0]                          next_data,
+    output  wire                                                transfering
 );
 
     wire    [arbiter_data_width-1:0]            data_in             [num_of_ports-1:0];
     wire    [num_of_ports*priority_width-1:0]   priority_in;
     wire    [num_of_ports*priority_width-1:0]   pre_priority_in;
     wire    [3:0]                               select;
-    wire                                        transfering;
 
     // 压缩data_in_p端口
     genvar i;
