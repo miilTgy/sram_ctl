@@ -23,6 +23,7 @@ module write_arbiter #(
     wire    [num_of_ports*priority_width-1:0]   priority_in;
     wire    [num_of_ports*priority_width-1:0]   pre_priority_in;
     wire    [3:0]                               select;
+    wire                                        transfering;
 
     // 压缩data_in_p端口
     genvar i;
