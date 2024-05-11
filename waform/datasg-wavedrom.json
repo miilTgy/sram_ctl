@@ -8,7 +8,7 @@
   {"name": "request"          , "wave": "01...|0.."},
   {"name": "pre_priority_in"  , "wave": "3.x..|...", "data": ["priority"]},
   {"name": "priority_in"      , "wave": "x3...|.x.", "data": ["priority"]},
-  {"name": "des_port_in"      , "wave": "x.5..|..x", "data": ["des"]},
+  {"name": "pre_des_port_in"  , "wave": "x5...|..x", "data": ["des"]},
   {"name": "address"          , "wave": "x.666|6x.", "data": ["ads1", "ads2", "", "adsn"]},
   {"name": "data_in"          , "wave": "x.444|4x.", "data": ["dat1", "dat2", "", "datn"]}
 ]}
