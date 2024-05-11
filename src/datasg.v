@@ -23,7 +23,10 @@ module datasg #(
     // [.] Complete this
     always @(posedge clk ) begin
         if (rst) begin
-            
+            request <= 1'b0; wr_priority <= {sg_priority_width{1'b0}};
+            des_port <= {sg_des_width{1'b0}};
+            address_write <= {sg_address_width{1'b0}};
+            data_write <= {sg_data_width{1'b0}};
         end
     end
 endmodule
