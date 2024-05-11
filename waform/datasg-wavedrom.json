@@ -1,14 +1,15 @@
 // Created by 曾广翼(mill) on 5-10
 // This is a waform which can be rendered by WaveDrom
 {"signal": [
-  {"name": "clk"              , "wave": "p....|..."},
-  {"name": "transfering"      , "wave": "0.1..|.0."},
-  {"name": "busy"             , "wave": "01...|.0."},
-  {"name": "eop"              , "wave": "0....|10."},
-  {"name": "request"          , "wave": "01...|0.."},
-  {"name": "pre_priority_in"  , "wave": "3.x..|...", "data": ["priority"]},
-  {"name": "priority_in"      , "wave": "x3...|.x.", "data": ["priority"]},
-  {"name": "pre_des_port_in"  , "wave": "x5...|..x", "data": ["des"]},
-  {"name": "address"          , "wave": "x.666|6x.", "data": ["ads1", "ads2", "", "adsn"]},
-  {"name": "data_in"          , "wave": "x.444|4x.", "data": ["dat1", "dat2", "", "datn"]}
+  {"name": "clk"              , "wave": "p....|...."},
+  {"name": "transfering"      , "wave": "0.1..|..0."},
+  {"name": "busy"             , "wave": "01...|..0."},
+  {"name": "eop"              , "wave": "0....|.10."},
+  {"name": "request"          , "wave": "0.1..|.0.."},
+  {"name": "request2"         , "wave": "01...|.0.."},
+  {"name": "pre_priority_in"  , "wave": "3.x..|....", "data": ["priority"]},
+  {"name": "priority_in"      , "wave": "x3...|..x.", "data": ["priority"]},
+  {"name": "pre_des_port_in"  , "wave": "x.5..|...x", "data": ["     des"]},
+  {"name": "address"          , "wave": "x..66|.6x.", "data": ["ads1", "...", "adsn"]},
+  {"name": "data_in"          , "wave": "x..44|.4x.", "data": ["dat1", "...", "datn"]}
 ]}
