@@ -39,7 +39,7 @@ module fifo #(
     always @(posedge clk ) begin
         if (rst) begin
             wptr <= 0; rptr <= 0; working <= 1'b0; ready <= 1'b0;
-            for (i = 32'b0; i < fifo_num_of_priority; i++) begin
+            for (i = 32'b0; i < fifo_length; i++) begin
                 fifo_buf[i] <= 0;
             end
         end else begin
