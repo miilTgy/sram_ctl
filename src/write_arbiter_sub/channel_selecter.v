@@ -8,11 +8,14 @@ module channel_selecter #(
     input                                                   clk,
     input                                                   rst,
     input                                                   enable,
+    input                                                   busy,
     input       [3:0]                                       select,
+    input       [3:0]                                       pre_selected,
     input       [(arbiter_data_width * num_of_ports)-1:0]   selected_data_in,
     input       [des_port_width*num_of_ports-1:0]           des_port_in,
     output  reg [arbiter_data_width-1:0]                    selected_data_out,
     output  reg [des_port_width-1:0]                        des_port_out,
+    output  reg [des_port_width-1:0]                        pre_des_port_out,
     output  reg [3:0]                                       enabled
 );
 
@@ -44,7 +47,11 @@ module channel_selecter #(
                 selected_data_out <= {arbiter_data_width{1'b0}};
                 des_port_lock <= 1'b0;
                 des_port_out <= {des_port_width{1'b0}};
+                pre_des_port_out <= {des_port_width{1'b0}};
                 enabled <= 4'b0000;
+            end
+            if (busy) begin
+                pre_des_port_out <= des_ports[pre_selected];
             end
         end
     end
