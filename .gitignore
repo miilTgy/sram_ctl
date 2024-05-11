@@ -2,4 +2,5 @@
 build/
 *.vcd
 *.out
+*.svg
 .DS_Store
