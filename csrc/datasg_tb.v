@@ -39,4 +39,16 @@ module datasg_tb ();
         $dumpfile("waveform.vcd");
         $dumpvars;
     end
+
+    initial begin
+        clk <= 1; rst <= 0; busy <= 0;
+        transfering <= 0; data_in <= 0;
+        priority_in <= 0; des_port_in <= 0;
+        #2;
+        rst <= 1;
+        #2;
+        rst <= 0;
+        #4;
+        $finish;
+    end
 endmodule
