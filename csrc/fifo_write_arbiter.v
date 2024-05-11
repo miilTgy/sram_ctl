@@ -73,9 +73,13 @@ module fifo_write_arbiter ();
 
     always #1 clk = ~clk;
     always #16 in_clk = ~in_clk;
+    integer iii;
     initial begin
         $dumpfile("waveform.vcd");
         $dumpvars;
+        for (iii = 0; iii<num_of_ports; iii=iii+1) begin
+            $dumpvars(0, wr_data_unpack[iii]);
+        end
     end
 
     integer i, k, jk;
@@ -91,17 +95,20 @@ module fifo_write_arbiter ();
         #2;
         rst <= 0;
         #28;
-        wr_sop <= 1; // 这是第32秒
+        wr_sop <= {(num_of_ports){1'b1}}; // 这是第32秒
         #32;
         wr_sop <= 0;
-        wr_vld <= 1;
+        wr_vld <= {(num_of_ports){1'b1}};
         for (i=0; i<num_of_ports; i=i+1) begin
             for (k=4; k<7; k=k+1) begin
                 wr_data_unpack[i][k] <= $random;
             end
         end
+        for (i=0; i<num_of_ports; i=i+1) begin
+            wr_data_unpack[i][3:0] <= i[3:0];
+        end
         #32;
-        for (jk=0; jk<fifo_length-2; jk=jk+1) begin
+        for (jk=0; jk<4; jk=jk+1) begin
             for (i=0; i<num_of_ports; i=i+1) begin
                 for (k=0; k<fifo_data_width; k=k+1) begin
                     wr_data_unpack[i][k] <= $random;
@@ -112,11 +119,11 @@ module fifo_write_arbiter ();
         for (i=0; i<num_of_ports; i=i+1) begin
             wr_data_unpack[i] <= 0;
         end
-        wr_eop <= 1;
+        wr_eop <= {(num_of_ports){1'b1}};
         #32;
         wr_eop <= 0;
         wr_vld <= 0;
-        #640;
+        #1280;
         $finish;
     end
 
