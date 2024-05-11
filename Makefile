@@ -9,8 +9,8 @@ MOD += $(shell find $(abspath $(MOD_PATH)/$(MOD_NAME)_sub) -name *.v)
 MOD += $(shell find $(abspath $(MOD_PATH)/write_arbiter_sub) -name *.v)
 iMOD = $(MOD)
 TB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.cpp)
-# iTB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.v)
-iTB += $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_write_arbiter.v)
+# iTB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.v) # TODO Uncomment this
+iTB += $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_write_arbiter.v) # TODO Comment this
 
 VERILATOR = verilator
 VERILATOR_FLAGS = --Wall --lint-only
