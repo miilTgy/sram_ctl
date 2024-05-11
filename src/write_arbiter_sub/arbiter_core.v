@@ -13,6 +13,7 @@ module arbiter_core # (
     input       [num_of_ports*priority_width-1:0]   pre_priority_in,
     output  reg [3:0]                               select,
     output  reg [num_of_ports-1:0]                  next_data,
+    output  reg [3:0]                               pre_selected,
     output  reg                                     transfering,
     output  reg                                     busy
 );
@@ -48,9 +49,11 @@ module arbiter_core # (
             end
         end else if (transfering && eop[select]) begin // 传输过程中eop进来的同时进入此分支
             transfering <= 1'b0;
+            pre_selected <= 4'b0000;
         end else if ((!busy) && (|ready)) begin // 第一拍数据进来的同时进入此分支
             busy <= 1'b1;
             next_data[pre_select_tmp] <= 1'b1;
+            pre_selected <= pre_select_tmp;
         end
         if (busy && (| eop)) begin // 最后一拍进入次分支
             busy <= 1'b0;
@@ -60,7 +63,7 @@ module arbiter_core # (
     end
 
     always @(negedge clk ) begin
-        if ((|ready) && (!busy)) begin
+        if ((|ready) && (!busy)) begin // 第一拍也会触发这个always块
             pre_select_tmp = 4'b0;
             pre_bigger = 3'b0;
             for (j = 0; j<num_of_ports; j = j + 1) begin
