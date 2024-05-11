@@ -19,6 +19,8 @@ module write_arbiter #(
     output  wire    [(arbiter_data_width)-1:0]                  selected_data_out,
     output  wire    [des_port_width-1:0]                        arbiter_des_port_out,
     output  wire    [num_of_ports-1:0]                          next_data,
+    output  wire    [3:0]                                       pre_selected,
+    output  reg     [des_port_width-1:0]                        pre_des_port_out,
     output  wire                                                transfering
 );
 
@@ -47,6 +49,7 @@ module write_arbiter #(
         .pre_priority_in            (pre_priority_in    ),
         .select                     (select             ),
         .next_data                  (next_data          ),
+        .pre_selected               (pre_selected       ),
         .transfering                (transfering        ),
         .busy                       (busy               )
     );
@@ -67,11 +70,14 @@ module write_arbiter #(
         .clk                        (clk                ),
         .rst                        (rst                ),
         .enable                     (transfering        ),
+        .busy                       (busy               ),
         .select                     (select             ),
+        .pre_selected               (pre_selected       ),
         .selected_data_in           (data_in_p          ),
         .des_port_in                (des_port_between   ),
         .selected_data_out          (selected_data_out  ),
         .des_port_out               (arbiter_des_port_out),
+        .pre_des_port_out           (pre_des_port_out   ),
         .enabled                    (                   )
     );
 
