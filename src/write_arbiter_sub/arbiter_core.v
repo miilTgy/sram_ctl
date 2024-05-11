@@ -36,49 +36,42 @@ module arbiter_core # (
 
     always @(posedge clk ) begin
         if (rst) begin
-            select = 4'b0000; select_tmp = 4'b0000; transfering = 1'b0;
-            pre_select_tmp = 4'b0000;
-            busy = 1'b0; next_data = {num_of_ports{1'b0}};
+            select <= 4'hf; select_tmp <= 4'b0000; transfering <= 1'b0;
+            pre_select_tmp <= 4'b0000;
+            busy <= 1'b0; next_data <= {num_of_ports{1'b0}};
         end else if (busy && (!transfering)) begin // 第二拍进入此分支，并开始传输数据
             if (sp0_wrr1) begin // wrr
-                bigger = bigger;
+                bigger <= bigger;
             end else begin      // sp
-                select_tmp = 4'b0;
-                bigger = 3'b0;
-                for (j = 0; j<num_of_ports; j = j + 1) begin
-                    if (ready[j]) begin  // arbit
-                        if (priorities[j] > bigger) begin
-                            bigger = priorities[j];
-                            select_tmp = j[3:0];
-                        end
-                    end
-                end
-                select = select_tmp;
-                transfering = 1'b1;
+                select <= pre_select_tmp;
+                transfering <= 1'b1;
             end
         end else if (transfering && eop[select]) begin // 传输过程中eop进来的同时进入此分支
-            transfering = 1'b0;
-        end else if (!busy) begin // 第一拍数据进来的同时进入此分支
-            busy = | ready;
+            transfering <= 1'b0;
+        end else if ((!busy) && (|ready)) begin // 第一拍数据进来的同时进入此分支
+            busy <= 1'b1;
+            next_data[pre_select_tmp] <= 1'b1;
+        end
+        if (busy && (| eop)) begin // 最后一拍进入次分支
+            busy <= 1'b0;
+            next_data[pre_select_tmp] <= 0;
+            select <= 0;
+        end
+    end
+
+    always @(negedge clk ) begin
+        if ((|ready) && (!busy)) begin
             pre_select_tmp = 4'b0;
             pre_bigger = 3'b0;
             for (j = 0; j<num_of_ports; j = j + 1) begin
                 if (ready[j]) begin
                     if (pre_priorities[j] > pre_bigger) begin
+                        $display("no.%d selected, prio: %d",j,priorities[j]);
                         pre_bigger = pre_priorities[j];
                         pre_select_tmp = j[3:0];
                     end
                 end
-                // $write("%d ", j);
-                // $write("pre_priority: %h ", pre_priorities[j]);
-                // $write("pre_bigger: %h ", pre_bigger);
-                // $write("pre_select_tmp: %h\n", pre_select_tmp);
             end
-            next_data[pre_select_tmp] = busy;
-        end
-        if (busy && (| eop)) begin
-            busy = 1'b0;
-            next_data[pre_select_tmp] = busy;
         end
     end
     
