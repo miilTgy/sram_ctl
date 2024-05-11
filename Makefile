@@ -71,6 +71,8 @@ ishow: ./waveform.vcd
 
 iwave: itest irun ishow
 
+irefresh: itest irun
+
 iclean: a.out
 	rm a.out
 
