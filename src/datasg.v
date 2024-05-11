@@ -9,7 +9,11 @@ module datasg #(
     // ports
     // [.] Make ports
     input                               rst,
+    input                               transfering,
+    input                               busy,
     input   [sg_data_width-1:0]         data_in,
+    input   [sg_address_width-1:0]      priority_in,
+    input   [sg_des_width-1:0]          des_port_in,
     output                              request,
     output  [sg_priority_width-1:0]     wr_priority,
     output  [sg_des_width-1:0]          des_port,
