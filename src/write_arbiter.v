@@ -3,7 +3,8 @@ module write_arbiter #(
     // parameters
     parameter num_of_ports       = 16,
     parameter arbiter_data_width = 64,
-    parameter priority_width     = 3
+    parameter priority_width     = 3,
+    parameter des_port_width     = 4
 ) (
     // ports
     input                                                       rst,
@@ -16,6 +17,7 @@ module write_arbiter #(
     input   wire    [(num_of_ports*arbiter_data_width)-1:0]     data_in_p,
     output  wire                                                busy,
     output  wire    [(arbiter_data_width)-1:0]                  selected_data_out,
+    output  wire    [des_port_width-1:0]                        arbiter_des_port_out,
     output  wire    [num_of_ports-1:0]                          next_data,
     output  wire                                                transfering
 );
@@ -24,6 +26,7 @@ module write_arbiter #(
     wire    [num_of_ports*priority_width-1:0]   priority_in;
     wire    [num_of_ports*priority_width-1:0]   pre_priority_in;
     wire    [3:0]                               select;
+    wire    [num_of_ports*des_port_width-1:0]   des_port_between;
 
     // 压缩data_in_p端口
     genvar i;
@@ -56,7 +59,8 @@ module write_arbiter #(
         .eop                        (eop                ),
         .select                     (select             ),
         .priority_out               (priority_in        ),
-        .pre_priority_out           (pre_priority_in    )
+        .pre_priority_out           (pre_priority_in    ),
+        .des_port_out               (des_port_between   )
     );
 
     channel_selecter channel_selecter_write (
@@ -65,7 +69,9 @@ module write_arbiter #(
         .enable                     (transfering        ),
         .select                     (select             ),
         .selected_data_in           (data_in_p          ),
+        .des_port_in                (des_port_between   ),
         .selected_data_out          (selected_data_out  ),
+        .des_port_out               (arbiter_des_port_out),
         .enabled                    (                   )
     );
 
