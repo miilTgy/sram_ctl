@@ -12,6 +12,7 @@ module priority_decoder #(
     input       [num_of_ports-1:0]                      ready,
     input       [num_of_ports-1:0]                      eop,
     input       [3:0]                                   select,
+    input       [3:0]                                   pre_selected,
     output  reg [num_of_ports*priority_width-1:0]       priority_out,
     output  reg [num_of_ports*priority_width-1:0]       pre_priority_out,
     output  reg [num_of_ports*des_port_width-1:0]       des_port_out
