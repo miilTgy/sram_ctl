@@ -68,7 +68,10 @@ module fifo_write_arbiter ();
         .data_in_p                  (data_in_p),
         .busy                       (busy),
         .selected_data_out          (data_out),
-        .next_data                  (next_data)
+        .arbiter_des_port_out       (arbiter_des_port_out),
+        .next_data                  (next_data),
+        .pre_selected               (pre_selected),
+        .transfering                (transfering)
     );
 
     always #1 clk = ~clk;
