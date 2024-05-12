@@ -11,5 +11,9 @@
   {"name": "priority_in"      , "wave": "x3...|..x.", "data": ["priority"]},
   {"name": "pre_des_port_in"  , "wave": "x.5..|...x", "data": ["     des"]},
   {"name": "address"          , "wave": "x..66|.6x.", "data": ["ads1", "...", "adsn"]},
-  {"name": "data_in"          , "wave": "x..44|.4x.", "data": ["dat1", "...", "datn"]}
+  {"name": "data_in"          , "wave": "x..44|.4x.", "data": ["dat1", "...", "datn"]},
+  {"name": "write_enable1"    , "wave": "0.1..|..0."},
+  {"name": "write_enable2"    , "wave": "0.1..|.0.."},
+  {"name": "write_enable3"    , "wave": "0..1.|..0."},
+  {"name": "write_enable4"    , "wave": "01...|.0.."},
 ]}
