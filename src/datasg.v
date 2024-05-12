@@ -29,7 +29,7 @@ module datasg #(
     output  wire                            write_enable3,
     output  wire                            write_enable4
 );
-    // [.] Complete this
+    // [x] Complete this
     reg writting;
 
     // assign data_write = data_in;
