@@ -14,4 +14,5 @@
   {"name": "address_to_read1" , "wave": "xxx55|55xx"},
   {"name": "last2"            , "wave": "0....|10.."},
   {"name": "address_to_read2" , "wave": "xx555|5xxx"},
+  {"name": "enb"              , "wave": "0.1..|.0.."},
 ]}
