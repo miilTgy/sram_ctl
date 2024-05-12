@@ -21,8 +21,6 @@ module read_arbiter #(
     output  reg     [num_of_priorities-1:0]                     next_data, // 告诉manager提供相应优先级的数据的下一位地址
     output  reg     [num_of_priorities-1:0]                     next_data2, // 用这个
 
-    //// input           [num_of_ports-1:0]                          rd_address_offset,
-    //// output          [num_of_ports-1:0]                          rd_priority,
     input           [(arbiter_data_width)-1:0]                  data_read, 
     input                                                       last1,
     input           [address_width-1:0]                         address_to_read1,
