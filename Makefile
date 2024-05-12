@@ -1,4 +1,4 @@
-MOD_NAME = datasg
+MOD_NAME = read_arbiter
 
 MOD_PATH = src
 TB_PATH = csrc
