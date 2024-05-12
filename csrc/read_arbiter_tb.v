@@ -4,13 +4,16 @@ module read_arbiter_tb ();
     parameter num_of_ports = 16;
     parameter address_width = 12;
     parameter arbiter_data_width = 64;
+    parameter wrr_weight_width = 5;
     
     // ports
     reg rst, clk, sp0_wrr1, ready;
     reg [num_of_priorities-1:0] prepared;
+    reg [wrr_weight_width-1:0] wrr_weight;
     wire [arbiter_data_width-1:0] rd_data;
     wire rd_sop, rd_vld, rd_eop;
     wire [num_of_priorities-1:0] next_data;
+    wire [num_of_priorities-1:0] next_data2;
 
     reg [arbiter_data_width-1:0] data_read;
     reg last1, last2;
@@ -26,6 +29,7 @@ module read_arbiter_tb ();
         .sp0_wrr1                   (sp0_wrr1),
         .ready                      (ready),
         .prepared                   (prepared),
+        .wrr_weight                 (wrr_weight),
         .rd_data                    (rd_data),
         .rd_sop                     (rd_sop),
         .rd_vld                     (rd_vld),
@@ -52,21 +56,9 @@ module read_arbiter_tb ();
         $dumpvars;
     end
 
-    initial begin
-        clk <= 1; rst <= 0; sp0_wrr1 <= 0;
-        ready <= 0; prepared <= 0;
-        data_read <= 0; last1 <= 0;
-        address_to_read1 <= 0;
-        last2 <= 0; address_to_read2 <= 0;
-        for (i=0; i<num_of_priorities; i=i+1) begin
-            prepared <= $random;
-        end
-        #2;
-        rst <= 1;
-        #2;
-        rst <= 0;
-        #6;
-        for (i=0; i<2; i=i+1) begin
+    reg tmpvar;
+    task ready_go;
+        begin
             ready <= 1;
             #2;
             ready <= 0;
@@ -88,11 +80,35 @@ module read_arbiter_tb ();
             last2 <= 1'b1;
             data_read <= {$random, $random};
             #1;
-            prepared[read_arbiter_tt.sp_select_tmp] = 0;
+            // if (tmpvar) begin
+            //     prepared[read_arbiter_tt.select_tmp] = 0;
+            // end
             #1;
             last2 <= 1'b0;
             data_read <= {$random, $random};
+            tmpvar = ~tmpvar;
             #6;
+        end
+    endtask
+
+    initial begin
+        tmpvar <= 0;
+        clk <= 1; rst <= 0; sp0_wrr1 <= 1;
+        ready <= 0; prepared <= 0;
+        data_read <= 0; last1 <= 0;
+        address_to_read1 <= 0; wrr_weight <= 5;
+        last2 <= 0; address_to_read2 <= 0;
+        for (i=0; i<num_of_priorities; i=i+1) begin
+            // prepared <= $random;
+            prepared[i] <= 1'b1;
+        end
+        #2;
+        rst <= 1;
+        #2;
+        rst <= 0;
+        #6;
+        for (i=0; i<32; i=i+1) begin
+            ready_go();
         end
         #6;
         $finish;
