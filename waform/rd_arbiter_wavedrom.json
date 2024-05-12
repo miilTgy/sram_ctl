@@ -1,0 +1,17 @@
+// Created by 曾广翼(mill) on 5-12
+// This is a waform which can be rendered by WaveDrom
+{"signal": [
+  {"name": "clk"              , "wave": "p....|...."},
+  {"name": "ready"            , "wave": "01...|..0."},
+  {"name": "rd_request1"      , "wave": "0.1..|..0."},
+  {"name": "rd_request2"      , "wave": "01...|..0."},
+  {"name": "rd_sop"           , "wave": "0.10.|...."},
+  {"name": "rd_vld"           , "wave": "0..1.|..0."},
+  {"name": "rd_data"          , "wave": "x..44|.4x."},
+  {"name": "data_read"        , "wave": "x..44|.4x."},
+  {"name": "rd_eop"           , "wave": "0....|..10"},
+  {"name": "last1"            , "wave": "0....|.10."},
+  {"name": "address_to_read1" , "wave": "xxx55|55xx"},
+  {"name": "last2"            , "wave": "0....|10.."},
+  {"name": "address_to_read2" , "wave": "xx555|5xxx"},
+]}
