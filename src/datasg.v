@@ -19,10 +19,15 @@ module datasg #(
     input       [sg_address_width-1:0]      priority_in,
     input       [sg_des_width-1:0]          des_port_in,
     output  reg                             request,
+    output  reg                             request2,
     output  wire[sg_priority_width-1:0]     wr_priority,
     output  wire[sg_des_width-1:0]          des_port,
     output  reg [sg_address_width-1:0]      address_write,
-    output  reg [sg_data_width-1:0]         data_write
+    output  reg [sg_data_width-1:0]         data_write,
+    output  wire                            write_enable1,
+    output  wire                            write_enable2,
+    output  wire                            write_enable3,
+    output  wire                            write_enable4
 );
     // [.] Complete this
     reg writting;
@@ -30,6 +35,10 @@ module datasg #(
     // assign data_write = data_in;
     assign des_port = des_port_in;
     assign wr_priority = priority_in;
+    assign write_enable1 = transfering;
+    assign write_enable2 = request;
+    assign write_enable3 = writting;
+    assign write_enable4 = request2;
 
     always @(posedge clk ) begin
         if (rst) begin
@@ -63,5 +72,6 @@ module datasg #(
 
     always @(* ) begin
         request = (transfering & (!(|eop)));
+        request2 = (busy & (!(|eop)));
     end
 endmodule
