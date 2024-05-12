@@ -42,7 +42,8 @@ module arbiter_core # (
             busy <= 1'b0; next_data <= {num_of_ports{1'b0}};
         end else if (busy && (!transfering)) begin // 第二拍进入此分支，并开始传输数据
             if (sp0_wrr1) begin // wrr
-                bigger <= bigger;
+                select <= pre_select_tmp;
+                transfering <= 1'b1;
             end else begin      // sp
                 select <= pre_select_tmp;
                 transfering <= 1'b1;
