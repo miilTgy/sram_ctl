@@ -31,6 +31,7 @@ module read_arbiter_tb ();
         .rd_vld                     (rd_vld),
         .rd_eop                     (rd_eop),
         .next_data                  (next_data),
+        .next_data2                 (next_data2),
         .data_read                  (data_read),
         .last1                      (last1),
         .address_to_read1           (address_to_read1),
