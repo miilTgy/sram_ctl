@@ -50,7 +50,7 @@ module read_arbiter #(
         if (rst) begin
             rd_sop <= 0; rd_vld <= 0; rd_eop <= 0;
             rd_request1 <= 0; useless <= 0;
-            useless2 <= 0; enb <= 0; next_data <= 0;
+            useless2 <= 0; next_data <= 0;
             last2_delay <= 0;
         end else begin
             if (ready && (!rd_sop) && (!rd_vld)) begin
@@ -82,6 +82,9 @@ module read_arbiter #(
 
     // 产生enb信号
     always @(posedge clk ) begin
+        if (rst) begin
+            enb <= 1'b0;
+        end
         if (ready && (!rd_sop) && (!rd_vld)) begin
             // ready进来后的第一拍
             enb <= 1'b1;
@@ -122,7 +125,7 @@ module read_arbiter #(
                     if (prepared[j] && (!arbi_lock) && (priority_offset == prio_now)) begin
                         // $display("got priority %d", j);
                         arbi_lock = 1'b1;
-                        select_tmp = j;
+                        select_tmp = j[priority_width-1:0];
                     end else if (prepared[j] && (!arbi_lock) && (priority_offset != prio_now)) begin
                         // [ ] 这里不是do nothing了，要改一下。
                         // wrr_now_biggest = j;
@@ -130,7 +133,7 @@ module read_arbiter #(
                     end
                     if (prepared[j] && (!biggest_lock)) begin
                         biggest_lock = 1'b1;
-                        wrr_now_biggest = j;
+                        wrr_now_biggest = j[priority_width-1:0];
                     end
                 end
                 if (select_tmp < smallest_select_tmp) begin
@@ -158,7 +161,7 @@ module read_arbiter #(
                 select_tmp = 0;
                 for (j=0; j<num_of_priorities; j=j+1) begin
                     if (prepared[j]) begin
-                        select_tmp = j;
+                        select_tmp = j[priority_width-1:0];
                     end else begin
                         next_data2 = next_data2;
                     end
@@ -176,7 +179,7 @@ module read_arbiter #(
     always @(prepared ) begin
         for (j=(num_of_priorities-1); j>=0; j=j-1) begin
             if (prepared[j]) begin
-                smallest_select_tmp = j;
+                smallest_select_tmp = j[priority_width-1:0];
             end else begin
                 next_data2 = next_data2;
             end
