@@ -77,3 +77,8 @@ iclean: a.out
 	rm a.out
 
 .PHONY: default check build clean run show wave ibuild itest irun ishow iwave
+
+cache:
+	iverilog ./src/cache_manager_sup/chain_manager.v ./src/cache_manager_sup/chain_manager_tb.v 
+	./a.out
+	gtkwave wave_chain.vcd &
