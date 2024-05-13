@@ -51,8 +51,7 @@ module read_arbiter #(
             rd_sop <= 0; rd_vld <= 0; rd_eop <= 0;
             rd_request1 <= 0; useless <= 0;
             useless2 <= 0; enb <= 0; next_data <= 0;
-            last2_delay <= 0; next_data2 <= 0;
-            wrr_count <= 0; priority_offset <= 0;
+            last2_delay <= 0;
         end else begin
             if (ready && (!rd_sop) && (!rd_vld)) begin
                 // ready拉高后第一拍进来这里
@@ -102,11 +101,15 @@ module read_arbiter #(
     reg [priority_width-1:0] smallest_select_tmp;
 
     always @(negedge clk ) begin
+        if (rst) begin
+            next_data2 = 0;
+            wrr_count = 0; priority_offset = 0;
+        end
         if (sp0_wrr1) begin
             // wrr here
             if (ready && (|prepared)) begin
                 if (!prepared[select_tmp]) begin // 代表上一次读的端口已经被读完了，重新开启wrr仲裁
-                    $display("last select out");
+                    // $display("last select out");
                     priority_offset = 0;
                     wrr_count = 0;
                 end
@@ -114,10 +117,10 @@ module read_arbiter #(
                 prio_now = 0;
                 select_tmp = 0;
                 biggest_lock = 0;
-                $display("enter here 1");
+                // $display("enter here 1");
                 for (j=(num_of_priorities-1); j>=0; j=j-1) begin // [.] Change it from sp to wrr use offset
                     if (prepared[j] && (!arbi_lock) && (priority_offset == prio_now)) begin
-                        $display("got priority %d", j);
+                        // $display("got priority %d", j);
                         arbi_lock = 1'b1;
                         select_tmp = j;
                     end else if (prepared[j] && (!arbi_lock) && (priority_offset != prio_now)) begin
@@ -137,10 +140,10 @@ module read_arbiter #(
                 if ((wrr_count+1)<wrr_weight) begin
                     // if (wrr_count == 0) begin
                     // end
-                    $display("heer 2");
+                    // $display("heer 2");
                     wrr_count = wrr_count + 1;
                 end else begin
-                    $display("heer 3");
+                    // $display("heer 3");
                     wrr_count = 0; 
                     priority_offset = priority_offset + 1;
                     // if (priority_offset) begin

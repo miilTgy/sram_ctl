@@ -1,3 +1,4 @@
+`timescale 1us/1us
 module read_arbiter_tb ();
     // parameters
     parameter num_of_priorities = 8;
