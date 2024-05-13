@@ -1,13 +1,16 @@
-# Created and maintanced by Zeng GuangYi(miil)
-MOD_NAME = channel_selecter
+MOD_NAME = read_arbiter
 
 MOD_PATH = src
 TB_PATH = csrc
 
 MOD = $(shell find $(abspath $(MOD_PATH)) -name $(MOD_NAME).v)
+# MOD += $(shell find $(abspath $(MOD_PATH)) -name write_arbiter.v)
+MOD += $(shell find $(abspath $(MOD_PATH)/$(MOD_NAME)_sub) -name *.v)
+# MOD += $(shell find $(abspath $(MOD_PATH)/write_arbiter_sub) -name *.v)
 iMOD = $(MOD)
 TB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.cpp)
-iTB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.v)
+iTB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.v) # TODO Uncomment this
+# iTB += $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_write_arbiter.v) # TODO Comment this
 
 VERILATOR = verilator
 VERILATOR_FLAGS = --Wall --lint-only
@@ -47,7 +50,7 @@ run: $(OBJ_DIR)/V$(MOD_NAME)
 	$(OBJ_DIR)/V$(MOD_NAME)
 
 show: dump.vcd
-	gtkwave dump.vcd
+	gtkwave dump.vcd &
 
 wave: all run show
 
@@ -64,19 +67,13 @@ irun: ./a.out
 	./a.out
 
 ishow: ./waveform.vcd
-	gtkwave waveform.vcd
+	gtkwave waveform.vcd &
 
 iwave: itest irun ishow
+
+irefresh: itest irun
 
 iclean: a.out
 	rm a.out
 
 .PHONY: default check build clean run show wave ibuild itest irun ishow iwave
-
-sram:
-	iverilog -o wave ./src/sram_testbench.v ./src/sram/sim/blk_mem_gen_0.v ./src/sram/simulation/blk_mem_gen_v8_4.v
-	vvp -n wave -lxt2
-	gtkwave wave.vcd
-
-cache:
-	iverilog -o cache.wave ./src/cache_manager_sup/chain_manager.v

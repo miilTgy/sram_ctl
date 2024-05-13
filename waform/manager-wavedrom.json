@@ -1,0 +1,10 @@
+// Created by 曾广翼(mill) on 5-12
+// This is a waform which can be rendered by WaveDrom
+{"signal": [
+  {"name": "clk  [input]"             , "wave": "hlhlhlhlhlhlhlhl"},
+  {"name": "ready  [input]"           , "wave": "0.1.0...|......."},
+  {"name": "next_data[n]  [input]"    , "wave": "0..1....|....0.."},
+  {"name": "address_to_read [output]" , "wave": "xxxx5.5.|.5.5.x.", "data": ["addr1", "...", "addrn-1", "addrn"]},
+  {"name": "last2 [output]"           , "wave": "0.......|...1.0."},
+  {"name": "prepared[n] [output]"     , "wave": "1.......|.....2."}
+]}
