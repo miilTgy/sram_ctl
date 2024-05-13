@@ -77,3 +77,6 @@ sram:
 	iverilog -o wave ./src/sram_testbench.v ./src/sram/sim/blk_mem_gen_0.v ./src/sram/simulation/blk_mem_gen_v8_4.v
 	vvp -n wave -lxt2
 	gtkwave wave.vcd
+
+cache:
+	iverilog -o cache.wave ./src/cache_manager_sup/chain_manager.v
