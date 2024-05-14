@@ -3,7 +3,8 @@ module priority_decoder #(
     parameter arbiter_data_width = 64,
     parameter num_of_ports       = 16,
     parameter priority_width     = 3,
-    parameter des_port_width     = 4
+    parameter des_port_width     = 4,
+    parameter pack_length_width  = 7
 ) (
     // ports
     input                                               clk,
@@ -15,13 +16,16 @@ module priority_decoder #(
     input       [3:0]                                   pre_selected,
     output  reg [num_of_ports*priority_width-1:0]       priority_out,
     output  reg [num_of_ports*priority_width-1:0]       pre_priority_out,
-    output  reg [num_of_ports*des_port_width-1:0]       des_port_out
+    output  reg [num_of_ports*des_port_width-1:0]       des_port_out,
+    output  reg [num_of_ports*pack_length_width-1:0]    pack_length_out
 );
 
     wire [arbiter_data_width-1:0] priorities_tmp [num_of_ports-1:0];
     wire [priority_width-1:0] priorities [num_of_ports-1:0];
     wire [arbiter_data_width-1:0] des_port_tmp [num_of_ports-1:0];
     wire [des_port_width-1:0] des_ports [num_of_ports-1:0];
+    wire [arbiter_data_width-1:0] pack_length_tmp [num_of_ports-1:0];
+    wire [pack_length_width-1:0] pack_length [num_of_ports-1:0];
 
     reg holding;
 
@@ -32,6 +36,8 @@ module priority_decoder #(
             assign priorities[j] = priorities_tmp[j][6:4];
             assign des_port_tmp[j] = priority_decoder_in[(j+1)*arbiter_data_width-1:j*arbiter_data_width];
             assign des_ports[j] = des_port_tmp[j][3:0];
+            assign pack_length_tmp[j] = priority_decoder_in[(j+1)*arbiter_data_width-1:j*arbiter_data_width];
+            assign pack_length[j] = pack_length_tmp[j][13:7];
             // assign des_port_out[(j+1)*des_port_width-1:j*des_port_width] = des_ports[j];
         end
     endgenerate
@@ -48,6 +54,7 @@ module priority_decoder #(
                     // 这里运用了一个新语法：signal[i+:n]表示从i位开始往上取n位。
                     priority_out[i*priority_width +: priority_width] <= priorities[i];
                     des_port_out[i*des_port_width +: des_port_width] <= des_ports[i];
+                    pack_length_out [i*pack_length_width +: pack_length_width] <= pack_length[i];
                     holding <= 1'b1;
                 end
             end else if (holding && eop[select]) begin

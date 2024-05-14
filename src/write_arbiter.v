@@ -4,7 +4,8 @@ module write_arbiter #(
     parameter num_of_ports       = 16,
     parameter arbiter_data_width = 64,
     parameter priority_width     = 3,
-    parameter des_port_width     = 4
+    parameter des_port_width     = 4,
+    parameter pack_length_width  = 7
 ) (
     // ports
     input                                                       rst,
@@ -18,9 +19,11 @@ module write_arbiter #(
     output  wire                                                busy,
     output  wire    [(arbiter_data_width)-1:0]                  selected_data_out,
     output  wire    [des_port_width-1:0]                        arbiter_des_port_out,
+    output  wire    [pack_length_width-1:0]                     ab_pack_length_out,
     output  wire    [num_of_ports-1:0]                          next_data,
     output  wire    [3:0]                                       pre_selected,
     output  wire    [des_port_width-1:0]                        pre_des_port_out,
+    output  wire    [pack_length_width-1:0]                     pre_pack_length_out,
     output  wire                                                transfering,
     output  wire    [priority_width-1:0]                        priority_out
 );
@@ -30,6 +33,7 @@ module write_arbiter #(
     wire    [num_of_ports*priority_width-1:0]   pre_priority_in;
     wire    [3:0]                               select;
     wire    [num_of_ports*des_port_width-1:0]   des_port_between;
+    wire    [num_of_ports*pack_length_width-1:0]pack_length_between;
 
     assign priority_out = priority_in;
 
@@ -66,7 +70,8 @@ module write_arbiter #(
         .select                     (select             ),
         .priority_out               (priority_in        ),
         .pre_priority_out           (pre_priority_in    ),
-        .des_port_out               (des_port_between   )
+        .des_port_out               (des_port_between   ),
+        .pack_length_out            (pack_length_between)
     );
 
     channel_selecter channel_selecter_write (
@@ -78,9 +83,12 @@ module write_arbiter #(
         .pre_selected               (pre_selected       ),
         .selected_data_in           (data_in_p          ),
         .des_port_in                (des_port_between   ),
+        .pack_length_in             (pack_length_between),
         .selected_data_out          (selected_data_out  ),
         .des_port_out               (arbiter_des_port_out),
+        .pack_length_out            (ab_pack_length_out ),
         .pre_des_port_out           (pre_des_port_out   ),
+        .pre_pack_length_out        (pre_pack_length_out),
         .enabled                    (                   )
     );
 

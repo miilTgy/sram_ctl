@@ -5,29 +5,31 @@ module datasg #(
     parameter sg_data_width = 64,
     parameter sg_address_width = 12,
     parameter sg_des_width = 4,
-    parameter sg_priority_width = 3
+    parameter sg_priority_width = 3,
+    parameter sg_pack_length_width = 7
 ) (
     // ports
     // [x] Make ports
-    input                                   rst,
-    input                                   clk,
-    input                                   transfering,
-    input                                   busy,
-    input       [num_of_ports-1:0]          eop,
-    input       [sg_data_width-1:0]         data_in,
-    input       [sg_address_width-1:0]      address_in,
-    input       [sg_address_width-1:0]      priority_in,
-    input       [sg_des_width-1:0]          des_port_in,
-    output  reg                             request,
-    output  reg                             request2,
-    output  wire[sg_priority_width-1:0]     wr_priority,
-    output  wire[sg_des_width-1:0]          des_port,
-    output  reg [sg_address_width-1:0]      address_write,
-    output  reg [sg_data_width-1:0]         data_write,
-    output  wire                            write_enable1,
-    output  wire                            write_enable2,
-    output  wire                            write_enable3,
-    output  wire                            write_enable4
+    input                                       rst,
+    input                                       clk,
+    input                                       transfering,
+    input                                       busy,
+    input           [num_of_ports-1:0]          eop,
+    input           [sg_data_width-1:0]         data_in,
+    input           [sg_address_width-1:0]      address_in,
+    input           [sg_address_width-1:0]      priority_in,
+    input           [sg_des_width-1:0]          des_port_in,
+    input           [sg_pack_length_width-1:0]  pack_length_in,
+    output  reg                                 request,
+    output  reg                                 request2,
+    output  wire    [sg_priority_width-1:0]     wr_priority,
+    output  wire    [sg_des_width-1:0]          des_port,
+    output  reg     [sg_address_width-1:0]      address_write,
+    output  reg     [sg_data_width-1:0]         data_write,
+    output  wire                                write_enable1,
+    output  wire                                write_enable2,
+    output  wire                                write_enable3,
+    output  wire                                write_enable4
 );
     // [x] Complete this
     reg writting;
@@ -35,6 +37,7 @@ module datasg #(
     // assign data_write = data_in;
     assign des_port = des_port_in;
     assign wr_priority = priority_in;
+    assign pack_length = pack_length_in;
     assign write_enable1 = transfering;
     assign write_enable2 = request;
     assign write_enable3 = writting;
