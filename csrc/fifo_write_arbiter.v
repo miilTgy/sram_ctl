@@ -103,7 +103,7 @@ module fifo_write_arbiter ();
         wr_sop <= 0;
         wr_vld <= {(num_of_ports){1'b1}};
         for (i=0; i<num_of_ports; i=i+1) begin
-            for (k=4; k<7; k=k+1) begin
+            for (k=4; k<14; k=k+1) begin
                 wr_data_unpack[i][k] <= $random;
             end
         end
