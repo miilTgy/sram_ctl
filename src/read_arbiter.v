@@ -22,6 +22,7 @@ module read_arbiter #(
     output  reg                                                 rd_eop,
     output  reg     [num_of_priorities-1:0]                     next_data, // 告诉manager提供相应优先级的数据的下一位地址
     output  reg     [num_of_priorities-1:0]                     next_data2, // 用这个
+    output  reg     [priority_width-1:0]                        priority_to_man,
 
     input           [(arbiter_data_width)-1:0]                  data_read, 
     input                                                       last1,
@@ -120,6 +121,7 @@ module read_arbiter #(
                 prio_now = 0;
                 select_tmp = 0;
                 biggest_lock = 0;
+                priority_to_man = 0;
                 // $display("enter here 1");
                 for (j=(num_of_priorities-1); j>=0; j=j-1) begin // [.] Change it from sp to wrr use offset
                     if (prepared[j] && (!arbi_lock) && (priority_offset == prio_now)) begin
@@ -127,7 +129,7 @@ module read_arbiter #(
                         arbi_lock = 1'b1;
                         select_tmp = j[priority_width-1:0];
                     end else if (prepared[j] && (!arbi_lock) && (priority_offset != prio_now)) begin
-                        // [ ] 这里不是do nothing了，要改一下。
+                        // [x] 这里不是do nothing了，要改一下。
                         // wrr_now_biggest = j;
                         prio_now = prio_now + 1;
                     end
@@ -154,6 +156,7 @@ module read_arbiter #(
                     // end
                 end
                 next_data2[select_tmp] = 1'b1;
+                priority_to_man = select_tmp;
             end
         end else begin
             //sp here
@@ -167,12 +170,15 @@ module read_arbiter #(
                     end
                 end
                 next_data2[select_tmp] = 1'b1;
+                priority_to_man = select_tmp;
             end
         end
         if (last2) begin
             next_data2 = 1'b0;
+            priority_to_man = 0;
         end else begin
             next_data2 = next_data2;
+            priority_to_man = priority_to_man;
         end
     end
 
@@ -182,6 +188,7 @@ module read_arbiter #(
                 smallest_select_tmp = j[priority_width-1:0];
             end else begin
                 next_data2 = next_data2;
+                priority_to_man = priority_to_man;
             end
         end
     end
