@@ -14,6 +14,8 @@ module arbiter_core # (
     output  reg [3:0]                               select,
     output  reg [num_of_ports-1:0]                  next_data,
     output  reg [3:0]                               pre_selected,
+    output  reg [3:0]                               pre_select_tmp,
+    output  reg [priority_width-1:0]                selected_priority_out,
     output  reg                                     transfering,
     output  reg                                     busy
 );
@@ -23,7 +25,7 @@ module arbiter_core # (
     reg [2:0] bigger;
     reg [3:0] select_tmp;
     reg [2:0] pre_bigger;
-    reg [3:0] pre_select_tmp;
+    // reg [3:0] pre_select_tmp;
     integer j;
 
     // unzip priority_in
@@ -67,15 +69,20 @@ module arbiter_core # (
         if ((|ready) && (!busy)) begin // 第一拍也会触发这个always块
             pre_select_tmp = 4'b0;
             pre_bigger = 3'b0;
+            selected_priority_out = 3'b0;
             for (j = 0; j<num_of_ports; j = j + 1) begin
                 if (ready[j]) begin
                     if (pre_priorities[j] > pre_bigger) begin
-                        $display("no.%d selected, prio: %d",j,priorities[j]);
+                        // $display("no.%d selected, prio: %d",j,pre_priorities[j]);
                         pre_bigger = pre_priorities[j];
                         pre_select_tmp = j[3:0];
+                        // $display("preselect_tmp: %d, prio %d", pre_select_tmp, pre_priorities[pre_select_tmp]);
                     end
                 end
             end
+            // $display("preselect_tmp: %d, prio %d", pre_select_tmp, pre_priorities[pre_select_tmp]);
+            $display("preselect_tmp: %d, prio %d", pre_select_tmp, pre_priority_in[(pre_select_tmp*3) +: 3]);
+            selected_priority_out = pre_priority_in[(pre_select_tmp*3) +: 3];
         end
     end
     

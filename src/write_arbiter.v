@@ -25,7 +25,7 @@ module write_arbiter #(
     output  wire    [des_port_width-1:0]                        pre_des_port_out,
     output  wire    [pack_length_width-1:0]                     pre_pack_length_out,
     output  wire                                                transfering,
-    output  wire    [priority_width-1:0]                        priority_out
+    output  reg     [priority_width-1:0]                        priority_out
 );
 
     wire    [arbiter_data_width-1:0]            data_in             [num_of_ports-1:0];
@@ -34,8 +34,16 @@ module write_arbiter #(
     wire    [3:0]                               select;
     wire    [num_of_ports*des_port_width-1:0]   des_port_between;
     wire    [num_of_ports*pack_length_width-1:0]pack_length_between;
+    wire    [3:0]                pre_select_tmp;
+    wire [priority_width-1:0]                selected_priority_out;
 
-    assign priority_out = priority_in;
+    // assign priority_out = pre_priority_in[pre_select_tmp*priority_width +: priority_width];
+
+    always @(posedge clk ) begin
+        if (|ready && !busy) begin
+            priority_out <= selected_priority_out;
+        end
+    end
 
     // 压缩data_in_p端口
     genvar i;
@@ -57,6 +65,8 @@ module write_arbiter #(
         .select                     (select             ),
         .next_data                  (next_data          ),
         .pre_selected               (pre_selected       ),
+        .pre_select_tmp             (pre_select_tmp     ),
+        .selected_priority_out      (selected_priority_out),
         .transfering                (transfering        ),
         .busy                       (busy               )
     );

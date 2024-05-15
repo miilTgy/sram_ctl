@@ -59,7 +59,7 @@ module priority_decoder #(
                 end
             end else if (holding && eop[select]) begin
                 holding <= 1'b0;
-                priority_out <= {num_of_ports*priority_width{1'b0}};
+                // priority_out <= {num_of_ports*priority_width{1'b0}};
             end
         end
     end
