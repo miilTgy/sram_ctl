@@ -7,6 +7,8 @@ module fifo_write_arbiter ();
     parameter fifo_data_width = 64;
     parameter fifo_num_of_priority = 8;
     parameter fifo_length = 32;
+    parameter des_port_width = 7;
+    parameter address_width = 12;
 
     // ports for fifo
     reg rst;
@@ -28,6 +30,12 @@ module fifo_write_arbiter ();
     wire busy;
     wire [arbiter_data_width-1:0] data_out; // packed
     wire [fifo_data_width*num_of_ports-1:0] data_in_p; // packed
+    wire [3:0] arbiter_des_port_out, pre_des_port_out;
+    wire [3:0] pre_selected;
+    wire [priority_width-1:0] priority_out;
+    wire [des_port_width-1:0] ab_pack_length_out, pre_pack_length_out;
+    reg  [address_width-1:0] address_in;
+
 
     // unpack ports
     genvar j;
@@ -69,9 +77,26 @@ module fifo_write_arbiter ();
         .busy                       (busy),
         .selected_data_out          (data_out),
         .arbiter_des_port_out       (arbiter_des_port_out),
+        .ab_pack_length_out         (ab_pack_length_out),
         .next_data                  (next_data),
         .pre_selected               (pre_selected),
-        .transfering                (transfering)
+        .pre_des_port_out           (pre_des_port_out),
+        .pre_pack_length_out        (pre_pack_length_out),
+        .transfering                (transfering),
+        .priority_out               (priority_out)
+    );
+
+    datasg datasg_ttt (
+        .rst                        (rst),
+        .clk                        (clk),
+        .transfering                (transfering),
+        .busy                       (busy),
+        .eop                        (eop),
+        .data_in                    (data_out),
+        .address_in                 (address_in),
+        .priority_in                (priority_out),
+        .des_port_in                (pre_des_port_out),
+        .pack_length_in             (pre_pack_length_out)
     );
 
     always #1 clk = ~clk;
@@ -89,7 +114,7 @@ module fifo_write_arbiter ();
     initial begin
         clk <= 1; sp0_wrr1 <= 0; rst <= 0;
         in_clk <= 1; wr_sop <= 0; wr_eop <= 0;
-        wr_vld <= 0;
+        wr_vld <= 0; address_in <= 0;
         for (i=0; i<num_of_ports; i=i+1) begin
             wr_data_unpack[i] <= 0;
         end
@@ -103,12 +128,13 @@ module fifo_write_arbiter ();
         wr_sop <= 0;
         wr_vld <= {(num_of_ports){1'b1}};
         for (i=0; i<num_of_ports; i=i+1) begin
-            for (k=4; k<7; k=k+1) begin
-                wr_data_unpack[i][k] <= $random;
+            for (k=4; k<14; k=k+1) begin
+                wr_data_unpack[i][k] = $random;
             end
+            wr_data_unpack[i][13:7] = 7'd4;
         end
         for (i=0; i<num_of_ports; i=i+1) begin
-            wr_data_unpack[i][3:0] <= i[3:0];
+            wr_data_unpack[i][3:0] = i[3:0];
         end
         #32;
         for (jk=0; jk<4; jk=jk+1) begin
