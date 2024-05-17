@@ -81,4 +81,3 @@ iclean: a.out
 cache:
 	iverilog ./src/cache_manager_sup/chain_manager.v ./src/cache_manager_sup/chain_manager_tb.v 
 	./a.out
-	gtkwave wave_chain.vcd &
