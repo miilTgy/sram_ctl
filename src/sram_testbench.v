@@ -1,4 +1,4 @@
-`timescale 1ns/100ps
+`timescale 100ps/10ps
 
 module sram_tb();
 
@@ -24,8 +24,8 @@ blk_mem_gen_0 sram (
   .addrb(addrb),  // input wire [11 : 0] addrb
   .doutb(doutb)  // output wire [63 : 0] doutb
 );
-  always #2 clka = ~clka;
-  always #2 clkb = ~clkb;
+  always #5 clka = ~clka;
+  always #5 clkb = ~clkb;
 
   initial begin
     $dumpfile("wave.vcd");        //生成的vcd文件名称
@@ -33,21 +33,21 @@ blk_mem_gen_0 sram (
 
     clka <= 1; clkb <= 1; ena<= 1; enb <= 1;
 
-    #4;
+    #40;
     wea <= 1;
     addra <= 0;
     dina <= 64'hABCDABCDABCDABCD;
-    #4;
+    #40;
     addra <= 1;
     dina <= 64'hBCDABCDABCDABCDA;
-    #4
+    #40
     wea <= 0;
     enb <= 1;
     addrb <= 0;
-    #4;
+    #40;
     addrb <= 1;
 
-    #20
+    #200
     $stop;
   end
 
