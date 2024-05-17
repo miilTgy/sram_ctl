@@ -12,7 +12,7 @@ module chain_manager
 
     //端口优先级对应编号
     parameter q0 = 0, //端口0为 [q0 +: 1] ～ [q0 +: 8]，以此类推 
-    parameter q1 = 8, //这样一来端口N的优先级M队列就是queue[N+M]，很文明
+    parameter q1 = 8, //这样一来端口N的优先级M队列就是queue[N*8+M]，很文明
     parameter q2 = 16,
     parameter q3 = 24,
     parameter q4 = 32,
@@ -43,7 +43,7 @@ module chain_manager
     //output_declaration
 
     input rea, //read_enable
-    input [8:0] chain_id, //读出包对应的链表节点序号
+    input [3:0] out_port, //需要读出哪个端口的数据
     output reg [11:0] start_read_address //读取起始地址
 
 
@@ -59,11 +59,12 @@ module chain_manager
     reg      [3:0] queue_num[127:0]; //queue[端口+优先级]中目前项目数量
 
     //循环变量
-    integer initial_loop;//rst过程的循环变量
+    integer initial_loop; //rst过程的循环变量
     integer write_loop; //写入过程的循环变量
     integer write_pointer; //写入过程的当前链表节点指针
     integer deallocate_loop; //内存回收过程的循环变量
     integer deallocate_pointer; //内存回收过程的当前链表节点指针
+    integer out_loop; integer out_loop_2;
 
 //----------initialization----------
     always @(posedge clk) begin
@@ -73,7 +74,7 @@ module chain_manager
             for (initial_loop=0;initial_loop<=units;initial_loop=initial_loop+1)
                 available[initial_loop] = 1; //初始化available
             for (initial_loop=0;initial_loop<=127;initial_loop=initial_loop+1)
-                    queue_num[initial_loop] = 4'b0;
+                    queue_num[initial_loop] = 4'b0; //初始化queue_num
 
             //初始化链表头chain[0]
             chain[0][sa-:12] = 1'b0; //start_address = 0
@@ -105,8 +106,8 @@ module chain_manager
                         chain[write_pointer][state] = 1; //如果需要分配的长度与内存块相同，则直接把state改为1
                         start_write_address = chain[write_pointer][sa-:12]; //输出起始地址
 
-                        queue[dest_port+priority][ queue_num[dest_port+priority] ] = write_pointer; //在当前队尾处写入该链表节点id
-                        queue_num[dest_port+priority] = queue_num[dest_port+priority] + 1; //该队列项目数量+1
+                        queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = write_pointer; //在当前队尾处写入该链表节点id
+                        queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
 
                         write_loop = units+1;
                     end
@@ -122,8 +123,8 @@ module chain_manager
                         chain[write_pointer][sa-:12] = chain[new_block][sa-:12] + w_size; //旧块的start_address等于新块start_address+size 
 
                         start_write_address = chain[new_block][sa-:12]; //输出起始地址
-                        queue[dest_port+priority][ queue_num[dest_port+priority] ] = new_block; //在当前队尾处写入新链表节点id
-                        queue_num[dest_port+priority] = queue_num[dest_port+priority] + 1; //该队列项目数量+1
+                        queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = new_block; //在当前队尾处写入新链表节点id
+                        queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
 
                         available[new_block] = 0; //刷新new_block
                         for(new_block = 0;available[new_block]==0;new_block=new_block+1); //从0开始寻找编号最小的未使用节点
@@ -144,8 +145,19 @@ module chain_manager
 //----------read-out-package----------
     always @(posedge clk) begin
         if (rea) begin
-            chain[ chain_id ][24] = 0;
-            start_read_address = chain[ chain_id ][11:0];
+            
+            for(out_loop=0;out_loop<=15;out_loop=out_loop+1) begin
+                if(queue_num[out_port+out_loop] != 0) begin
+                    start_read_address = chain[ queue[out_port+out_loop][0] ][sa-:12]; //输出地址就是第一项对应链表节点的sa;
+                    chain[ queue[out_port+out_loop][0] ][state] = 0; //该链表节点state设为0
+                    queue_num[out_port+out_loop] = queue_num[out_port+out_loop] - 1; //该队列项目数量-1
+                    for(out_loop_2=0;out_loop_2<15;out_loop_2=out_loop_2+1)
+                        queue[out_port+out_loop][out_loop_2] = queue[out_port+out_loop][out_loop_2 + 1];//队列内所有项目往前挪一位
+
+                    out_loop = 16;
+                end
+                else;
+            end
         end
     end
 
