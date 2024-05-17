@@ -59,20 +59,22 @@ module chain_manager
 //----------recording-new-package----------
     always @(posedge clk) begin
         if (wea) begin
-            $display("wea");
+            $display("wea is posedge");
             record_loop = 0;
             i = 0; //i为当前遍历到的链表节点编号
 
             for(record_loop=0;record_loop<=units;record_loop=record_loop+1) begin //开始寻找可用内存块
 
-                $display("record loop = %d, i = %d, state = %d, size = %d",record_loop,i,chain[i][24],chain[i][23:12]);
+                $display("record loop = %d, i = %d, state = %d, size = %d",record_loop,i,chain[i][state],chain[i][size-:12]);
                 
-                if(chain[i][state] == 0 && chain[i][size-:12] >= w_size) begin //发现可用内存块，开始分配
+                if(chain[i][state] == 0 && chain[i][size-:12] >= w_size) begin //如果发现state为0且长度大于等于需要长度的块就开始分配
                     
                     $display("found");
 
-                    if(chain[i][size-:12] == w_size) begin //如果需要分配的长度与内存块相同，则直接把state改为1
-                        chain[i][state] = 1; 
+                    if(chain[i][size-:12] == w_size) begin 
+                        chain[i][state] = 1; //如果需要分配的长度与内存块相同，则直接把state改为1
+                        start_write_address = chain[i][sa-:12]; //输出起始地址
+
                         record_loop = units+1;
                     end
                     else begin  //如果内存块长度大于分配长度，则将该块一分为二
@@ -89,8 +91,10 @@ module chain_manager
                         start_write_address = chain[new_block][sa-:12]; //输出起始地址
 
                         available[new_block] = 0; //刷新new_block
-                        for(new_block = 0;available[new_block]==0;new_block=new_block+1);
+                        for(new_block = 0;available[new_block]==0;new_block=new_block+1); //从0开始寻找编号最小的未使用节点
+
                         $display("entered an end");
+
                         record_loop = units+1;
                     end
                 
@@ -114,10 +118,13 @@ module chain_manager
     always @(negedge clk) begin
         k = 0;
         for(deallocate_loop=0;deallocate_loop<=units;deallocate_loop=deallocate_loop+1) begin  //当chain[k]的next不等于null时继续
+            
             if(chain[k][24] == 0 && chain[ chain[k][48:37] ][24] == 0 && available[k] == 0 && available[ chain[k][48:37] ] == 0) begin //当发现当前内存块和下一个内存块的state都为0，且两个块都正在被使用时，开始吞并
+                
                 available[ chain[k][48:37] ] = 1; //下一个内存块的链表位置空出
                 chain[k][23:12] = chain[k][23:12] + chain[ chain[k][48:37] ][23:12]; //当前块的size加上下一个块的size
                 chain[k][48:37] = chain[ chain[k][48:37] ][48:37]; //当前块的next等于下一个块的next
+                
             end
             else if( chain[k][48:37] == 12'hFFF ) deallocate_loop = units+1; //如果next为null则停止循环
             k = chain[k][48:37]; //寻找下一个内存块节点序号
