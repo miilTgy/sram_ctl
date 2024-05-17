@@ -5,3 +5,4 @@ build/
 *.svg
 .DS_Store
 wave
+cache.wave
