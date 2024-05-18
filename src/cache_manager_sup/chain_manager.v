@@ -38,28 +38,28 @@ module chain_manager
     input [7:0] w_size, //写入包长度
     input [2:0] priority, //该数据包的优先级，0~7
     input [3:0] dest_port, //该数据包的目标端口,0~15
-    output reg [11:0] write_address, //写入地址
-    output reg writing, //正在传输写入地址时拉高
+    output reg [11:0] write_address = 0, //写入地址
+    output reg writing = 0, //正在传输写入地址时拉高
 
     //package_output_related_declaration
 
     //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
-    output reg [11:0] port_0_addr, input [3:0] port_0_priority, input port_0_rea, output reg port_0_reading,
-    output reg [11:0] port_1_addr, input [3:0] port_1_priority, input port_1_rea, output reg port_1_reading,
-    output reg [11:0] port_2_addr, input [3:0] port_2_priority, input port_2_rea, output reg port_2_reading,
-    output reg [11:0] port_3_addr, input [3:0] port_3_priority, input port_3_rea, output reg port_3_reading,
-    output reg [11:0] port_4_addr, input [3:0] port_4_priority, input port_4_rea, output reg port_4_reading,
-    output reg [11:0] port_5_addr, input [3:0] port_5_priority, input port_5_rea, output reg port_5_reading,
-    output reg [11:0] port_6_addr, input [3:0] port_6_priority, input port_6_rea, output reg port_6_reading,
-    output reg [11:0] port_7_addr, input [3:0] port_7_priority, input port_7_rea, output reg port_7_reading,
-    output reg [11:0] port_8_addr, input [3:0] port_8_priority, input port_8_rea, output reg port_8_reading,
-    output reg [11:0] port_9_addr, input [3:0] port_9_priority, input port_9_rea, output reg port_9_reading,
-    output reg [11:0] port_10_addr, input [3:0] port_10_priority, input port_10_rea, output reg port_10_reading,
-    output reg [11:0] port_11_addr, input [3:0] port_11_priority, input port_11_rea, output reg port_11_reading,
-    output reg [11:0] port_12_addr, input [3:0] port_12_priority, input port_12_rea, output reg port_12_reading,
-    output reg [11:0] port_13_addr, input [3:0] port_13_priority, input port_13_rea, output reg port_13_reading,
-    output reg [11:0] port_14_addr, input [3:0] port_14_priority, input port_14_rea, output reg port_14_reading,
-    output reg [11:0] port_15_addr, input [3:0] port_15_priority, input port_15_rea, output reg port_15_reading
+    output reg [11:0] port_0_addr = 0, input [3:0] port_0_priority, input port_0_rea, output reg port_0_reading = 0,
+    output reg [11:0] port_1_addr = 0, input [3:0] port_1_priority, input port_1_rea, output reg port_1_reading = 0,
+    output reg [11:0] port_2_addr = 0, input [3:0] port_2_priority, input port_2_rea, output reg port_2_reading = 0,
+    output reg [11:0] port_3_addr = 0, input [3:0] port_3_priority, input port_3_rea, output reg port_3_reading = 0,
+    output reg [11:0] port_4_addr = 0, input [3:0] port_4_priority, input port_4_rea, output reg port_4_reading = 0,
+    output reg [11:0] port_5_addr = 0, input [3:0] port_5_priority, input port_5_rea, output reg port_5_reading = 0,
+    output reg [11:0] port_6_addr = 0, input [3:0] port_6_priority, input port_6_rea, output reg port_6_reading = 0,
+    output reg [11:0] port_7_addr = 0, input [3:0] port_7_priority, input port_7_rea, output reg port_7_reading = 0,
+    output reg [11:0] port_8_addr = 0, input [3:0] port_8_priority, input port_8_rea, output reg port_8_reading = 0,
+    output reg [11:0] port_9_addr = 0, input [3:0] port_9_priority, input port_9_rea, output reg port_9_reading = 0,
+    output reg [11:0] port_10_addr = 0, input [3:0] port_10_priority, input port_10_rea, output reg port_10_reading = 0,
+    output reg [11:0] port_11_addr = 0, input [3:0] port_11_priority, input port_11_rea, output reg port_11_reading = 0,
+    output reg [11:0] port_12_addr = 0, input [3:0] port_12_priority, input port_12_rea, output reg port_12_reading = 0,
+    output reg [11:0] port_13_addr = 0, input [3:0] port_13_priority, input port_13_rea, output reg port_13_reading = 0,
+    output reg [11:0] port_14_addr = 0, input [3:0] port_14_priority, input port_14_rea, output reg port_14_reading = 0,
+    output reg [11:0] port_15_addr = 0, input [3:0] port_15_priority, input port_15_rea, output reg port_15_reading = 0
 
 );
 
@@ -67,6 +67,8 @@ module chain_manager
     reg [48:0] chain[units:0]; //双向链表，每个单元的数据定义参考parameter处注释
     reg [units:0] available;  //用于记录链表中某节点序号项是否被使用
     integer new_block; //指示新链表节点序号
+    integer write_done = 0; 
+    integer found_new_block = 0;
 
     //用于记录数据包输出顺序的队列，16个端口，每个端口8个优先级，每个优先级16个座位，每个座位记录一个chain_id
     reg [8:0][15:0] queue[127:0]; //queue[端口*8+优先级][第几项]
@@ -75,6 +77,7 @@ module chain_manager
     //循环变量
     integer initial_loop; //rst过程的循环变量
     integer write_loop; //写入过程的循环变量
+    integer find_block_loop;
     integer write_pointer; //写入过程的当前链表节点指针
     integer addr_left; //地址传输过程中剩余的位数
     integer deallocate_loop; //内存回收过程的循环变量
@@ -133,9 +136,7 @@ module chain_manager
             chain[0][next-:12] = 12'hFFF; //next = null
             available[0] = 0; //链表头已使用
             new_block = 1; //从chain[1]开始添加节点
-            writing = 0;
-            addr_left = 0;
-            port_0_reading = 0;
+
         end
     end    
 
@@ -149,60 +150,72 @@ module chain_manager
     end
 
     always @(posedge clk) begin //开始传输新包的地址
-        if (wea && ~writing) begin
+        if (wea && writing == 0) begin
             $display("wea is posedge");
             write_loop = 0;
-            write_pointer = 0; //i为当前遍历到的链表节点编号
+            write_done = 0;
+            write_pointer = 0; //当前遍历到的链表节点编号
 
             for(write_loop=0;write_loop<units;write_loop=write_loop+1) begin //开始寻找可用内存块
 
-                $display("record loop = %d, pointer = %d, state = %d, size = %d",write_loop,write_pointer,chain[write_pointer][state],chain[write_pointer][size-:12]);
-                
-                if(chain[write_pointer][state] == 0 && chain[write_pointer][size-:12] >= w_size) begin //如果发现state为0且长度大于等于需要长度的块就开始分配
+                $display("record loop = %d, pointer = %d, state = %d, size = %d, done = %d",write_loop,write_pointer,chain[write_pointer][state],chain[write_pointer][size-:12],write_done);
+                if(write_done == 0) begin
+                    $display("available loop");
+                    if(chain[write_pointer][state] == 0 && chain[write_pointer][size-:12] >= w_size) begin //如果发现state为0且长度大于等于需要长度的块就开始分配
                     
-                    $display("found");
+                        $display("found");
 
-                    if(chain[write_pointer][size-:12] == w_size) begin 
-                        chain[write_pointer][state] = 1; //如果需要分配的长度与内存块相同，则直接把state改为1
-                        write_address = chain[write_pointer][sa-:12]; //输出起始地址
-                        addr_left = w_size - 1;
-                        writing = 1;
+                        if(chain[write_pointer][size-:12] == w_size) begin 
+                            chain[write_pointer][state] = 1; //如果需要分配的长度与内存块相同，则直接把state改为1
+                            write_address = chain[write_pointer][sa-:12]; //输出起始地址
+                            addr_left = w_size - 1;
+                            writing = 1;
 
-                        queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = write_pointer; //在当前队尾处写入该链表节点id
-                        queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
+                            queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = write_pointer; //在当前队尾处写入该链表节点id
+                            queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
 
-                        write_loop = units+1;
+                            write_done = 1;
+                        end
+                        else begin  //如果内存块长度大于分配长度，则将该块一分为二
+                            chain[new_block][prev-:12] = write_pointer; //新块的prev指向旧块节点序号
+                            chain[new_block][next-:12] = chain[write_pointer][next-:12]; //新块的next指向旧块的next
+                            chain[new_block][sa-:12] = chain[write_pointer][sa-:12]; //新块的start_address等于旧块的start_address
+                            chain[new_block][size-:12] = w_size; //新块的size等于新分配的size
+                            chain[new_block][state] = 1; //新块的state等于1
+
+                            chain[write_pointer][next-:12] = new_block; //旧块的prev不变，next指向新块节点序号
+                            chain[write_pointer][size-:12] = chain[write_pointer][size-:12] - w_size; //旧块的size等于原size减去被切割的长度
+                            chain[write_pointer][sa-:12] = chain[new_block][sa-:12] + w_size; //旧块的start_address等于新块start_address+size 
+
+                            write_address = chain[new_block][sa-:12]; //输出起始地址
+                            addr_left = w_size - 1; //记录剩余输入地址位数
+                            writing = 1; //标记开始写入
+
+                            queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = new_block; //在当前队尾处写入新链表节点id
+                            queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
+                            available[new_block] = 0; //新块已被占用
+
+                            //刷新new_block
+                            new_block = 0; found_new_block = 0;
+                            for(find_block_loop = 0;find_block_loop<units;find_block_loop=find_block_loop+1) begin //从0开始寻找编号最小的未使用节点
+                                if(found_new_block == 0)
+                                    if(available[find_block_loop]==1)begin
+                                        new_block = find_block_loop;
+                                        found_new_block = 1;
+                                    end
+                            end 
+
+                            $display("entered an end");
+
+                            write_done = 1;
+                        end
+                    
                     end
-                    else begin  //如果内存块长度大于分配长度，则将该块一分为二
-                        chain[new_block][prev-:12] = write_pointer; //新块的prev指向旧块节点序号
-                        chain[new_block][next-:12] = chain[write_pointer][next-:12]; //新块的next指向旧块的next
-                        chain[new_block][sa-:12] = chain[write_pointer][sa-:12]; //新块的start_address等于旧块的start_address
-                        chain[new_block][size-:12] = w_size; //新块的size等于新分配的size
-                        chain[new_block][state] = 1; //新块的state等于1
-
-                        chain[write_pointer][next-:12] = new_block; //旧块的prev不变，next指向新块节点序号
-                        chain[write_pointer][size-:12] = chain[write_pointer][size-:12] - w_size; //旧块的size等于原size减去被切割的长度
-                        chain[write_pointer][sa-:12] = chain[new_block][sa-:12] + w_size; //旧块的start_address等于新块start_address+size 
-
-                        write_address = chain[new_block][sa-:12]; //输出起始地址
-                        addr_left = w_size - 1;
-                        writing = 1;
-
-                        queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = new_block; //在当前队尾处写入新链表节点id
-                        queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
-
-                        available[new_block] = 0; //刷新new_block
-                        for(new_block = 0;available[new_block]==0;new_block=new_block+1); //从0开始寻找编号最小的未使用节点
-
-                        $display("entered an end");
-
-                        write_loop = units+1;
+                    else begin
+                        write_pointer = chain[write_pointer][next-:12]; //寻找下一个内存块
                     end
-                
                 end
-                else begin
-                    write_pointer = chain[write_pointer][next-:12]; //寻找下一个内存块
-                end
+                else write_done = write_done;
             end
         end
     end
@@ -216,7 +229,7 @@ module chain_manager
         else port_0_reading = 0; //读取完毕
     end
     always @(posedge clk) begin
-        if (port_0_rea && ~port_0_reading) begin
+        if (port_0_rea && port_0_reading == 0) begin
             if( queue_num[ port_0_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
                 port_0_addr = chain[ queue[ port_0_priority ][0] ][sa-:12]; //输出队列头项的起始地址
                 port_0_addr_left = chain[ queue[ port_0_priority ][0] ][size-:12] - 1;
