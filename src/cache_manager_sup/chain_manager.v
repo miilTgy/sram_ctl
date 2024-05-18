@@ -38,16 +38,34 @@ module chain_manager
     input [7:0] w_size, //写入包长度
     input [2:0] priority, //该数据包的优先级，0~7
     input [3:0] dest_port, //该数据包的目标端口,0~15
-    output reg [11:0] start_write_address, //写入起始地址
+    output reg [11:0] write_address, //写入地址
+    output reg writing, //正在传输写入地址时拉高
 
     //package_output_related_declaration
 
-    input rea, //read_enable
-    input [127:0] out_port, //需要读出哪个端口哪个优先级的数据，index为“端口号*8+优先级”
-    output reg read_allowed, //当out_port对应队列有东西输出时拉高
-    output reg [11:0] start_read_address, //读取起始地址
-    output reg [7:0] r_size //读出包大小
+    //input rea, //read_enable
+    //input [7:0] out_port, //需要读出哪个端口哪个优先级的数据，index为“端口号*8+优先级”
+    //output reg read_allowed, //当out_port对应队列有东西输出时拉高
+    //output reg [11:0] start_read_address, //读取起始地址
+    //output reg [7:0] r_size //读出包大小
 
+    //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
+    output reg [11:0] port_0_addr, input [3:0] port_0_priority, input port_0_rea, output reg port_0_reading,
+    output reg [11:0] port_1_addr, input [3:0] port_1_priority, input port_1_rea, output reg port_1_reading,
+    output reg [11:0] port_2_addr, input [3:0] port_2_priority, input port_2_rea, output reg port_2_reading,
+    output reg [11:0] port_3_addr, input [3:0] port_3_priority, input port_3_rea, output reg port_3_reading,
+    output reg [11:0] port_4_addr, input [3:0] port_4_priority, input port_4_rea, output reg port_4_reading,
+    output reg [11:0] port_5_addr, input [3:0] port_5_priority, input port_5_rea, output reg port_5_reading,
+    output reg [11:0] port_6_addr, input [3:0] port_6_priority, input port_6_rea, output reg port_6_reading,
+    output reg [11:0] port_7_addr, input [3:0] port_7_priority, input port_7_rea, output reg port_7_reading,
+    output reg [11:0] port_8_addr, input [3:0] port_8_priority, input port_8_rea, output reg port_8_reading,
+    output reg [11:0] port_9_addr, input [3:0] port_9_priority, input port_9_rea, output reg port_9_reading,
+    output reg [11:0] port_10_addr, input [3:0] port_10_priority, input port_10_rea, output reg port_10_reading,
+    output reg [11:0] port_11_addr, input [3:0] port_11_priority, input port_11_rea, output reg port_11_reading,
+    output reg [11:0] port_12_addr, input [3:0] port_12_priority, input port_12_rea, output reg port_12_reading,
+    output reg [11:0] port_13_addr, input [3:0] port_13_priority, input port_13_rea, output reg port_13_reading,
+    output reg [11:0] port_14_addr, input [3:0] port_14_priority, input port_14_rea, output reg port_14_reading,
+    output reg [11:0] port_15_addr, input [3:0] port_15_priority, input port_15_rea, output reg port_15_reading
 
 );
 
@@ -64,9 +82,10 @@ module chain_manager
     integer initial_loop; //rst过程的循环变量
     integer write_loop; //写入过程的循环变量
     integer write_pointer; //写入过程的当前链表节点指针
+    integer addr_left; //地址传输过程中剩余的位数
     integer deallocate_loop; //内存回收过程的循环变量
     integer deallocate_pointer; //内存回收过程的当前链表节点指针
-    integer out_loop; integer out_loop_2;
+    integer out_loop_0; integer out_loop_2;
 
 //----------initialization----------
     always @(posedge clk) begin
@@ -86,13 +105,25 @@ module chain_manager
             chain[0][next-:12] = 12'hFFF; //next = null
             available[0] = 0; //链表头已使用
             new_block = 1; //从chain[1]开始添加节点
-            read_allowed = 0;
+            writing = 0;
+            addr_left = 0;
+            port_0_reading = 0;
         end
     end    
 
 //----------allocate-new-space----------
-    always @(posedge clk) begin
-        if (wea) begin
+    always @(posedge clk) begin //正在传输地址
+        if(writing && addr_left > 0) begin
+            write_address = write_address + 1;
+            addr_left = addr_left - 1;
+        end
+        else begin
+            writing = 0;
+        end
+    end
+
+    always @(posedge clk) begin //开始传输新包的地址
+        if (wea && ~writing) begin
             $display("wea is posedge");
             write_loop = 0;
             write_pointer = 0; //i为当前遍历到的链表节点编号
@@ -107,7 +138,9 @@ module chain_manager
 
                     if(chain[write_pointer][size-:12] == w_size) begin 
                         chain[write_pointer][state] = 1; //如果需要分配的长度与内存块相同，则直接把state改为1
-                        start_write_address = chain[write_pointer][sa-:12]; //输出起始地址
+                        write_address = chain[write_pointer][sa-:12]; //输出起始地址
+                        addr_left = w_size - 1;
+                        writing = 1;
 
                         queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = write_pointer; //在当前队尾处写入该链表节点id
                         queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
@@ -125,7 +158,10 @@ module chain_manager
                         chain[write_pointer][size-:12] = chain[write_pointer][size-:12] - w_size; //旧块的size等于原size减去被切割的长度
                         chain[write_pointer][sa-:12] = chain[new_block][sa-:12] + w_size; //旧块的start_address等于新块start_address+size 
 
-                        start_write_address = chain[new_block][sa-:12]; //输出起始地址
+                        write_address = chain[new_block][sa-:12]; //输出起始地址
+                        addr_left = w_size - 1;
+                        writing = 1;
+
                         queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = new_block; //在当前队尾处写入新链表节点id
                         queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
 
@@ -147,18 +183,20 @@ module chain_manager
 
 //----------read-out-package----------
     always @(posedge clk) begin
-        if (rea) begin
-            if( queue_num[ out_port ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                read_allowed = 1; //允许读出
-                start_read_address = chain[ queue[ out_port ][0] ][sa-:12]; //输出队列头项的起始地址
-                r_size = chain[ queue[ out_port ][0] ][size-:12]; //输出该数据包长度
-                chain[ queue[ out_port ][0] ][state] = 0; //该链表节点state设为0
-                queue_num[ out_port ] = queue_num[ out_port ] - 1; //该队列长度减1
+        if (port_0_rea) begin
+            if( queue_num[ port_0_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_0_reading = 1; //允许读出
+                port_0_addr = chain[ queue[ port_0_priority ][0] ][sa-:12]; //输出队列头项的起始地址
 
-                for(out_loop=0;out_loop<15;out_loop=out_loop+1)
-                        queue[out_port][out_loop] = queue[out_port][out_loop + 1];//队列内所有项目往前挪一位
+                
+                //r_size = chain[ queue[ 0 ][0] ][size-:12]; //输出该数据包长度
+                chain[ queue[ port_0_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ port_0_priority ] = queue_num[ port_0_priority ] - 1; //该队列长度减1
+
+                for(out_loop_0=0;out_loop_0<15;out_loop_0=out_loop_0+1)
+                    queue[ port_0_priority ][out_loop_0] = queue[ port_0_priority ][out_loop_0+1];//队列内所有项目往前挪一位
         end
-        else;
+        else out_loop_0 = 0;
            
     end
 
