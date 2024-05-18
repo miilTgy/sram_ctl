@@ -43,12 +43,6 @@ module chain_manager
 
     //package_output_related_declaration
 
-    //input rea, //read_enable
-    //input [7:0] out_port, //需要读出哪个端口哪个优先级的数据，index为“端口号*8+优先级”
-    //output reg read_allowed, //当out_port对应队列有东西输出时拉高
-    //output reg [11:0] start_read_address, //读取起始地址
-    //output reg [7:0] r_size //读出包大小
-
     //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
     output reg [11:0] port_0_addr, input [3:0] port_0_priority, input port_0_rea, output reg port_0_reading,
     output reg [11:0] port_1_addr, input [3:0] port_1_priority, input port_1_rea, output reg port_1_reading,
@@ -85,7 +79,41 @@ module chain_manager
     integer addr_left; //地址传输过程中剩余的位数
     integer deallocate_loop; //内存回收过程的循环变量
     integer deallocate_pointer; //内存回收过程的当前链表节点指针
-    integer out_loop_0; integer out_loop_2;
+    integer out_loop_0;
+    integer out_loop_1;
+    integer out_loop_2;
+    integer out_loop_3;
+    integer out_loop_4;
+    integer out_loop_5;
+    integer out_loop_6;
+    integer out_loop_7;
+    integer out_loop_8;
+    integer out_loop_9;
+    integer out_loop_10;
+    integer out_loop_11;
+    integer out_loop_12;
+    integer out_loop_13;
+    integer out_loop_14;
+    integer out_loop_15;
+
+
+    //输出端口剩余位数
+    integer port_0_addr_left = 0;
+    integer port_1_addr_left = 0;
+    integer port_2_addr_left = 0;
+    integer port_3_addr_left = 0;
+    integer port_4_addr_left = 0;
+    integer port_5_addr_left = 0;
+    integer port_6_addr_left = 0;
+    integer port_7_addr_left = 0;
+    integer port_8_addr_left = 0;
+    integer port_9_addr_left = 0;
+    integer port_10_addr_left = 0;
+    integer port_11_addr_left = 0;
+    integer port_12_addr_left = 0;
+    integer port_13_addr_left = 0;
+    integer port_14_addr_left = 0;
+    integer port_15_addr_left = 0;
 
 //----------initialization----------
     always @(posedge clk) begin
@@ -117,9 +145,7 @@ module chain_manager
             write_address = write_address + 1;
             addr_left = addr_left - 1;
         end
-        else begin
-            writing = 0;
-        end
+        else writing = 0;
     end
 
     always @(posedge clk) begin //开始传输新包的地址
@@ -182,14 +208,20 @@ module chain_manager
     end
 
 //----------read-out-package----------
+    always @(posedge clk) begin //正在传输地址
+        if(port_0_reading && port_0_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_0_addr = port_0_addr + 1;
+            port_0_addr_left = port_0_addr_left - 1;
+        end
+        else port_0_reading = 0; //读取完毕
+    end
     always @(posedge clk) begin
-        if (port_0_rea) begin
+        if (port_0_rea && ~port_0_reading) begin
             if( queue_num[ port_0_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_0_reading = 1; //允许读出
                 port_0_addr = chain[ queue[ port_0_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-
+                port_0_addr_left = chain[ queue[ port_0_priority ][0] ][size-:12] - 1;
+                port_0_reading = 1; //允许读出
                 
-                //r_size = chain[ queue[ 0 ][0] ][size-:12]; //输出该数据包长度
                 chain[ queue[ port_0_priority ][0] ][state] = 0; //该链表节点state设为0
                 queue_num[ port_0_priority ] = queue_num[ port_0_priority ] - 1; //该队列长度减1
 
