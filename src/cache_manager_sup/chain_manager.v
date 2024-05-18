@@ -32,7 +32,7 @@ module chain_manager
     input rst,
     input clk,
 
-    //input declaration
+    //package_input_related_declaration
 
     input wea, //write_enable
     input [7:0] w_size, //写入包长度
@@ -40,11 +40,13 @@ module chain_manager
     input [3:0] dest_port, //该数据包的目标端口,0~15
     output reg [11:0] start_write_address, //写入起始地址
 
-    //output_declaration
+    //package_output_related_declaration
 
     input rea, //read_enable
-    input [3:0] out_port, //需要读出哪个端口的数据
-    output reg [11:0] start_read_address //读取起始地址
+    input [127:0] out_port, //需要读出哪个端口哪个优先级的数据，index为“端口号*8+优先级”
+    output reg read_allowed, //当out_port对应队列有东西输出时拉高
+    output reg [11:0] start_read_address, //读取起始地址
+    output reg [7:0] r_size //读出包大小
 
 
 );
@@ -55,8 +57,8 @@ module chain_manager
     integer new_block; //指示新链表节点序号
 
     //用于记录数据包输出顺序的队列，16个端口，每个端口8个优先级，每个优先级16个座位，每个座位记录一个chain_id
-    reg [8:0][15:0] queue[127:0]; //queue[端口+优先级][第几项]
-    reg      [3:0] queue_num[127:0]; //queue[端口+优先级]中目前项目数量
+    reg [8:0][15:0] queue[127:0]; //queue[端口*8+优先级][第几项]
+    reg      [3:0] queue_num[127:0]; //queue[端口*8+优先级]中目前项目数量
 
     //循环变量
     integer initial_loop; //rst过程的循环变量
@@ -84,6 +86,7 @@ module chain_manager
             chain[0][next-:12] = 12'hFFF; //next = null
             available[0] = 0; //链表头已使用
             new_block = 1; //从chain[1]开始添加节点
+            read_allowed = 0;
         end
     end    
 
@@ -145,20 +148,18 @@ module chain_manager
 //----------read-out-package----------
     always @(posedge clk) begin
         if (rea) begin
-            
-            for(out_loop=0;out_loop<=15;out_loop=out_loop+1) begin
-                if(queue_num[out_port+out_loop] != 0) begin
-                    start_read_address = chain[ queue[out_port+out_loop][0] ][sa-:12]; //输出地址就是第一项对应链表节点的sa;
-                    chain[ queue[out_port+out_loop][0] ][state] = 0; //该链表节点state设为0
-                    queue_num[out_port+out_loop] = queue_num[out_port+out_loop] - 1; //该队列项目数量-1
-                    for(out_loop_2=0;out_loop_2<15;out_loop_2=out_loop_2+1)
-                        queue[out_port+out_loop][out_loop_2] = queue[out_port+out_loop][out_loop_2 + 1];//队列内所有项目往前挪一位
+            if( queue_num[ out_port ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                read_allowed = 1; //允许读出
+                start_read_address = chain[ queue[ out_port ][0] ][sa-:12]; //输出队列头项的起始地址
+                r_size = chain[ queue[ out_port ][0] ][size-:12]; //输出该数据包长度
+                chain[ queue[ out_port ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ out_port ] = queue_num[ out_port ] - 1; //该队列长度减1
 
-                    out_loop = 16;
-                end
-                else;
-            end
+                for(out_loop=0;out_loop<15;out_loop=out_loop+1)
+                        queue[out_port][out_loop] = queue[out_port][out_loop + 1];//队列内所有项目往前挪一位
         end
+        else;
+           
     end
 
 //----------deallocate-nearby-free-space----------
