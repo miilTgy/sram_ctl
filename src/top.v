@@ -43,28 +43,28 @@ module top #(
     reg [7:0] w_size; //写入包长度
     reg [2:0] priority; //该数据包的优先级，0~7
     reg [3:0] dest_port; //该数据包的目标端口;0~15
-    reg [11:0] write_address = 0; //写入地址
+    reg [16:0] write_address = 0; //写入地址
     reg writing = 0; //正在传输写入地址时拉高
 
     //package_output_related_declaration
 
     //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
-    reg [11:0] port_0_addr = 0; reg [3:0] port_0_priority; reg port_0_rea;  reg port_0_reading = 0;
-    reg [11:0] port_1_addr = 0; reg [3:0] port_1_priority; reg port_1_rea;  reg port_1_reading = 0;
-    reg [11:0] port_2_addr = 0; reg [3:0] port_2_priority; reg port_2_rea;  reg port_2_reading = 0;
-    reg [11:0] port_3_addr = 0; reg [3:0] port_3_priority; reg port_3_rea;  reg port_3_reading = 0;
-    reg [11:0] port_4_addr = 0; reg [3:0] port_4_priority; reg port_4_rea;  reg port_4_reading = 0;
-    reg [11:0] port_5_addr = 0; reg [3:0] port_5_priority; reg port_5_rea;  reg port_5_reading = 0;
-    reg [11:0] port_6_addr = 0; reg [3:0] port_6_priority; reg port_6_rea;  reg port_6_reading = 0;
-    reg [11:0] port_7_addr = 0; reg [3:0] port_7_priority; reg port_7_rea;  reg port_7_reading = 0;
-    reg [11:0] port_8_addr = 0; reg [3:0] port_8_priority; reg port_8_rea;  reg port_8_reading = 0;
-    reg [11:0] port_9_addr = 0; reg [3:0] port_9_priority; reg port_9_rea;  reg port_9_reading = 0;
-    reg [11:0] port_10_addr = 0; reg [3:0] port_10_priority; reg port_10_rea;  reg port_10_reading = 0;
-    reg [11:0] port_11_addr = 0; reg [3:0] port_11_priority; reg port_11_rea;  reg port_11_reading = 0;
-    reg [11:0] port_12_addr = 0; reg [3:0] port_12_priority; reg port_12_rea;  reg port_12_reading = 0;
-    reg [11:0] port_13_addr = 0; reg [3:0] port_13_priority; reg port_13_rea;  reg port_13_reading = 0;
-    reg [11:0] port_14_addr = 0; reg [3:0] port_14_priority; reg port_14_rea;  reg port_14_reading = 0;
-    reg [11:0] port_15_addr = 0; reg [3:0] port_15_priority; reg port_15_rea;  reg port_15_reading = 0;
+    reg [16:0] port_0_addr = 0; reg [3:0] port_0_priority; reg port_0_rea;  reg port_0_reading = 0; reg port_0_prepared;
+    reg [16:0] port_1_addr = 0; reg [3:0] port_1_priority; reg port_1_rea;  reg port_1_reading = 0; reg port_1_prepared;
+    reg [16:0] port_2_addr = 0; reg [3:0] port_2_priority; reg port_2_rea;  reg port_2_reading = 0; reg port_2_prepared;
+    reg [16:0] port_3_addr = 0; reg [3:0] port_3_priority; reg port_3_rea;  reg port_3_reading = 0; reg port_3_prepared;
+    reg [16:0] port_4_addr = 0; reg [3:0] port_4_priority; reg port_4_rea;  reg port_4_reading = 0; reg port_4_prepared;
+    reg [16:0] port_5_addr = 0; reg [3:0] port_5_priority; reg port_5_rea;  reg port_5_reading = 0; reg port_5_prepared;
+    reg [16:0] port_6_addr = 0; reg [3:0] port_6_priority; reg port_6_rea;  reg port_6_reading = 0; reg port_6_prepared;
+    reg [16:0] port_7_addr = 0; reg [3:0] port_7_priority; reg port_7_rea;  reg port_7_reading = 0; reg port_7_prepared;
+    reg [16:0] port_8_addr = 0; reg [3:0] port_8_priority; reg port_8_rea;  reg port_8_reading = 0; reg port_8_prepared;
+    reg [16:0] port_9_addr = 0; reg [3:0] port_9_priority; reg port_9_rea;  reg port_9_reading = 0; reg port_9_prepared;
+    reg [16:0] port_10_addr = 0; reg [3:0] port_10_priority; reg port_10_rea;  reg port_10_reading = 0; reg port_10_prepared;
+    reg [16:0] port_11_addr = 0; reg [3:0] port_11_priority; reg port_11_rea;  reg port_11_reading = 0; reg port_11_prepared;
+    reg [16:0] port_12_addr = 0; reg [3:0] port_12_priority; reg port_12_rea;  reg port_12_reading = 0; reg port_12_prepared;
+    reg [16:0] port_13_addr = 0; reg [3:0] port_13_priority; reg port_13_rea;  reg port_13_reading = 0; reg port_13_prepared;
+    reg [16:0] port_14_addr = 0; reg [3:0] port_14_priority; reg port_14_rea;  reg port_14_reading = 0; reg port_14_prepared;
+    reg [16:0] port_15_addr = 0; reg [3:0] port_15_priority; reg port_15_rea;  reg port_15_reading = 0; reg port_15_prepared;
 
     // ports for fifo
     reg in_clk;
@@ -110,22 +110,22 @@ module top #(
         .dest_port(dest_port),
         .write_address(write_address),
         .writing(writing),
-        .port_0_addr(port_0_addr), .port_0_priority(port_0_priority), .port_0_rea(port_0_rea), .port_0_reading(port_0_reading),
-        .port_1_addr(port_1_addr), .port_1_priority(port_1_priority), .port_1_rea(port_1_rea), .port_1_reading(port_1_reading),
-        .port_2_addr(port_2_addr), .port_2_priority(port_2_priority), .port_2_rea(port_2_rea), .port_2_reading(port_2_reading),
-        .port_3_addr(port_3_addr), .port_3_priority(port_3_priority), .port_3_rea(port_3_rea), .port_3_reading(port_3_reading),
-        .port_4_addr(port_4_addr), .port_4_priority(port_4_priority), .port_4_rea(port_4_rea), .port_4_reading(port_4_reading),
-        .port_5_addr(port_5_addr), .port_5_priority(port_5_priority), .port_5_rea(port_5_rea), .port_5_reading(port_5_reading),
-        .port_6_addr(port_6_addr), .port_6_priority(port_6_priority), .port_6_rea(port_6_rea), .port_6_reading(port_6_reading),
-        .port_7_addr(port_7_addr), .port_7_priority(port_7_priority), .port_7_rea(port_7_rea), .port_7_reading(port_7_reading),
-        .port_8_addr(port_8_addr), .port_8_priority(port_8_priority), .port_8_rea(port_8_rea), .port_8_reading(port_8_reading),
-        .port_9_addr(port_9_addr), .port_9_priority(port_9_priority), .port_9_rea(port_9_rea), .port_9_reading(port_9_reading),
-        .port_10_addr(port_10_addr), .port_10_priority(port_10_priority), .port_10_rea(port_10_rea), .port_10_reading(port_10_reading),
-        .port_11_addr(port_11_addr), .port_11_priority(port_11_priority), .port_11_rea(port_11_rea), .port_11_reading(port_11_reading),
-        .port_12_addr(port_12_addr), .port_12_priority(port_12_priority), .port_12_rea(port_12_rea), .port_12_reading(port_12_reading),
-        .port_13_addr(port_13_addr), .port_13_priority(port_13_priority), .port_13_rea(port_13_rea), .port_13_reading(port_13_reading),
-        .port_14_addr(port_14_addr), .port_14_priority(port_14_priority), .port_14_rea(port_14_rea), .port_14_reading(port_14_reading),
-        .port_15_addr(port_15_addr), .port_15_priority(port_15_priority), .port_15_rea(port_15_rea), .port_15_reading(port_15_reading)
+        .port_0_addr(port_0_addr), .port_0_priority(port_0_priority), .port_0_rea(port_0_rea), .port_0_reading(port_0_reading), .port_0_prepared(port_0_prepared),
+        .port_1_addr(port_1_addr), .port_1_priority(port_1_priority), .port_1_rea(port_1_rea), .port_1_reading(port_1_reading), .port_1_prepared(port_1_prepared),
+        .port_2_addr(port_2_addr), .port_2_priority(port_2_priority), .port_2_rea(port_2_rea), .port_2_reading(port_2_reading), .port_2_prepared(port_2_prepared),
+        .port_3_addr(port_3_addr), .port_3_priority(port_3_priority), .port_3_rea(port_3_rea), .port_3_reading(port_3_reading), .port_3_prepared(port_3_prepared),
+        .port_4_addr(port_4_addr), .port_4_priority(port_4_priority), .port_4_rea(port_4_rea), .port_4_reading(port_4_reading), .port_4_prepared(port_4_prepared),
+        .port_5_addr(port_5_addr), .port_5_priority(port_5_priority), .port_5_rea(port_5_rea), .port_5_reading(port_5_reading), .port_5_prepared(port_5_prepared),
+        .port_6_addr(port_6_addr), .port_6_priority(port_6_priority), .port_6_rea(port_6_rea), .port_6_reading(port_6_reading), .port_6_prepared(port_6_prepared),
+        .port_7_addr(port_7_addr), .port_7_priority(port_7_priority), .port_7_rea(port_7_rea), .port_7_reading(port_7_reading), .port_7_prepared(port_7_prepared),
+        .port_8_addr(port_8_addr), .port_8_priority(port_8_priority), .port_8_rea(port_8_rea), .port_8_reading(port_8_reading), .port_8_prepared(port_8_prepared),
+        .port_9_addr(port_9_addr), .port_9_priority(port_9_priority), .port_9_rea(port_9_rea), .port_9_reading(port_9_reading), .port_9_prepared(port_9_prepared),
+        .port_10_addr(port_10_addr), .port_10_priority(port_10_priority), .port_10_rea(port_10_rea), .port_10_reading(port_10_reading), .port_10_prepared(port_10_prepared),
+        .port_11_addr(port_11_addr), .port_11_priority(port_11_priority), .port_11_rea(port_11_rea), .port_11_reading(port_11_reading), .port_11_prepared(port_11_prepared),
+        .port_12_addr(port_12_addr), .port_12_priority(port_12_priority), .port_12_rea(port_12_rea), .port_12_reading(port_12_reading), .port_12_prepared(port_12_prepared),
+        .port_13_addr(port_13_addr), .port_13_priority(port_13_priority), .port_13_rea(port_13_rea), .port_13_reading(port_13_reading), .port_13_prepared(port_13_prepared),
+        .port_14_addr(port_14_addr), .port_14_priority(port_14_priority), .port_14_rea(port_14_rea), .port_14_reading(port_14_reading), .port_14_prepared(port_14_prepared),
+        .port_15_addr(port_15_addr), .port_15_priority(port_15_priority), .port_15_rea(port_15_rea), .port_15_reading(port_15_reading), .port_15_prepared(port_15_prepared)
 
 
     );

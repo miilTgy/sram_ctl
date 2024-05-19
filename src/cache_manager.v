@@ -3,12 +3,13 @@
 
 module cache_manager
 #(
-    parameter units = 512, //链表单元数量,sram为4096*8Bytes，数据包最小为64Bytes
-    parameter next = 48, //[48:37]为next
-    parameter prev = 36, //[36:25]为prev
-    parameter state = 24,//[24]为state
-    parameter size = 23, //[23:12]为size
-    parameter sa = 11, //[11:0]为start_address
+    parameter addr_lines = 16, //1MB需要[16:0]
+    parameter units = 16384, //链表单元数量,sram为32*4096*8Bytes，数据包最小为64Bytes
+    parameter sa = addr_lines, //[sa-:addr_lines]为start_address
+    parameter size = sa+addr_lines+1, //[size-:addr_lines]为size
+    parameter state = size+1,//[state]为state
+    parameter prev = state+addr_lines+1, //[prev-:addr_lines]为prev
+    parameter next = prev+addr_lines+1, //[next-:addr_lines]为next
 
     //端口优先级对应编号
     parameter q0 = 0, //端口0为 [q0 +: 1] ～ [q0 +: 8]，以此类推 
@@ -38,28 +39,28 @@ module cache_manager
     input [7:0] w_size, //写入包长度
     input [2:0] priority, //该数据包的优先级，0~7
     input [3:0] dest_port, //该数据包的目标端口,0~15
-    output reg [11:0] write_address = 0, //写入地址
+    output reg [addr_lines:0] write_address = 0, //写入地址
     output reg writing = 0, //正在传输写入地址时拉高
 
     //package_output_related_declaration
 
     //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
-    output reg [11:0] port_0_addr = 0, input [3:0] port_0_priority, input port_0_rea, output reg port_0_reading = 0,
-    output reg [11:0] port_1_addr = 0, input [3:0] port_1_priority, input port_1_rea, output reg port_1_reading = 0,
-    output reg [11:0] port_2_addr = 0, input [3:0] port_2_priority, input port_2_rea, output reg port_2_reading = 0,
-    output reg [11:0] port_3_addr = 0, input [3:0] port_3_priority, input port_3_rea, output reg port_3_reading = 0,
-    output reg [11:0] port_4_addr = 0, input [3:0] port_4_priority, input port_4_rea, output reg port_4_reading = 0,
-    output reg [11:0] port_5_addr = 0, input [3:0] port_5_priority, input port_5_rea, output reg port_5_reading = 0,
-    output reg [11:0] port_6_addr = 0, input [3:0] port_6_priority, input port_6_rea, output reg port_6_reading = 0,
-    output reg [11:0] port_7_addr = 0, input [3:0] port_7_priority, input port_7_rea, output reg port_7_reading = 0,
-    output reg [11:0] port_8_addr = 0, input [3:0] port_8_priority, input port_8_rea, output reg port_8_reading = 0,
-    output reg [11:0] port_9_addr = 0, input [3:0] port_9_priority, input port_9_rea, output reg port_9_reading = 0,
-    output reg [11:0] port_10_addr = 0, input [3:0] port_10_priority, input port_10_rea, output reg port_10_reading = 0,
-    output reg [11:0] port_11_addr = 0, input [3:0] port_11_priority, input port_11_rea, output reg port_11_reading = 0,
-    output reg [11:0] port_12_addr = 0, input [3:0] port_12_priority, input port_12_rea, output reg port_12_reading = 0,
-    output reg [11:0] port_13_addr = 0, input [3:0] port_13_priority, input port_13_rea, output reg port_13_reading = 0,
-    output reg [11:0] port_14_addr = 0, input [3:0] port_14_priority, input port_14_rea, output reg port_14_reading = 0,
-    output reg [11:0] port_15_addr = 0, input [3:0] port_15_priority, input port_15_rea, output reg port_15_reading = 0
+    output reg [addr_lines:0] port_0_addr = 0, input [3:0] port_0_priority, input port_0_rea, output reg port_0_reading = 0, output reg port_0_prepared = 0,
+    output reg [addr_lines:0] port_1_addr = 0, input [3:0] port_1_priority, input port_1_rea, output reg port_1_reading = 0, output reg port_1_prepared = 0,
+    output reg [addr_lines:0] port_2_addr = 0, input [3:0] port_2_priority, input port_2_rea, output reg port_2_reading = 0, output reg port_2_prepared = 0,
+    output reg [addr_lines:0] port_3_addr = 0, input [3:0] port_3_priority, input port_3_rea, output reg port_3_reading = 0, output reg port_3_prepared = 0,
+    output reg [addr_lines:0] port_4_addr = 0, input [3:0] port_4_priority, input port_4_rea, output reg port_4_reading = 0, output reg port_4_prepared = 0,
+    output reg [addr_lines:0] port_5_addr = 0, input [3:0] port_5_priority, input port_5_rea, output reg port_5_reading = 0, output reg port_5_prepared = 0,
+    output reg [addr_lines:0] port_6_addr = 0, input [3:0] port_6_priority, input port_6_rea, output reg port_6_reading = 0, output reg port_6_prepared = 0,
+    output reg [addr_lines:0] port_7_addr = 0, input [3:0] port_7_priority, input port_7_rea, output reg port_7_reading = 0, output reg port_7_prepared = 0,
+    output reg [addr_lines:0] port_8_addr = 0, input [3:0] port_8_priority, input port_8_rea, output reg port_8_reading = 0, output reg port_8_prepared = 0,
+    output reg [addr_lines:0] port_9_addr = 0, input [3:0] port_9_priority, input port_9_rea, output reg port_9_reading = 0, output reg port_9_prepared = 0,
+    output reg [addr_lines:0] port_10_addr = 0, input [3:0] port_10_priority, input port_10_rea, output reg port_10_reading = 0, output reg port_10_prepared = 0,
+    output reg [addr_lines:0] port_11_addr = 0, input [3:0] port_11_priority, input port_11_rea, output reg port_11_reading = 0, output reg port_11_prepared = 0,
+    output reg [addr_lines:0] port_12_addr = 0, input [3:0] port_12_priority, input port_12_rea, output reg port_12_reading = 0, output reg port_12_prepared = 0,
+    output reg [addr_lines:0] port_13_addr = 0, input [3:0] port_13_priority, input port_13_rea, output reg port_13_reading = 0, output reg port_13_prepared = 0,
+    output reg [addr_lines:0] port_14_addr = 0, input [3:0] port_14_priority, input port_14_rea, output reg port_14_reading = 0, output reg port_14_prepared = 0,
+    output reg [addr_lines:0] port_15_addr = 0, input [3:0] port_15_priority, input port_15_rea, output reg port_15_reading = 0, output reg port_15_prepared = 0
 
 );
 
@@ -98,6 +99,8 @@ module cache_manager
     integer out_loop_13;
     integer out_loop_14;
     integer out_loop_15;
+    integer prepared_i;
+    integer prepared_j;
 
 
     //输出端口剩余位数
@@ -129,11 +132,11 @@ module cache_manager
                     queue_num[initial_loop] = 4'b0; //初始化queue_num
 
             //初始化链表头chain[0]
-            chain[0][sa-:12] = 1'b0; //start_address = 0
-            chain[0][size-:12] = 12'hFFF; //size = 4096
+            chain[0][sa-:addr_lines] = 1'b0; //start_address = 0
+            chain[0][size-:addr_lines] = 17'hFFFFF; //size = 4096
             chain[0][state] = 1'b0;  // state = 0
-            chain[0][prev-:12] = 12'hFFF; // prev = null
-            chain[0][next-:12] = 12'hFFF; //next = null
+            chain[0][prev-:addr_lines] = 17'hFFFFF; // prev = null
+            chain[0][next-:addr_lines] = 17'hFFFFF; //next = null
             available[0] = 0; //链表头已使用
             new_block = 1; //从chain[1]开始添加节点
 
@@ -158,16 +161,16 @@ module cache_manager
 
             for(write_loop=0;write_loop<units;write_loop=write_loop+1) begin //开始寻找可用内存块
 
-                $display("record loop = %d, pointer = %d, state = %d, size = %d, done = %d",write_loop,write_pointer,chain[write_pointer][state],chain[write_pointer][size-:12],write_done);
+                $display("record loop = %d, pointer = %d, state = %d, size = %d, done = %d",write_loop,write_pointer,chain[write_pointer][state],chain[write_pointer][size-:addr_lines+1],write_done);
                 if(write_done == 0) begin
                     $display("available loop");
-                    if(chain[write_pointer][state] == 0 && chain[write_pointer][size-:12] >= w_size) begin //如果发现state为0且长度大于等于需要长度的块就开始分配
+                    if(chain[write_pointer][state] == 0 && chain[write_pointer][size-:addr_lines+1] >= w_size) begin //如果发现state为0且长度大于等于需要长度的块就开始分配
                     
                         $display("found");
 
-                        if(chain[write_pointer][size-:12] == w_size) begin 
+                        if(chain[write_pointer][size-:addr_lines+1] == w_size) begin 
                             chain[write_pointer][state] = 1; //如果需要分配的长度与内存块相同，则直接把state改为1
-                            write_address = chain[write_pointer][sa-:12]; //输出起始地址
+                            write_address = chain[write_pointer][sa-:addr_lines+1]; //输出起始地址
                             addr_left = w_size - 1;
                             writing = 1;
 
@@ -177,17 +180,17 @@ module cache_manager
                             write_done = 1; //已经找到块了，后续循环作废
                         end
                         else begin  //如果内存块长度大于分配长度，则将该块一分为二
-                            chain[new_block][prev-:12] = write_pointer; //新块的prev指向旧块节点序号
-                            chain[new_block][next-:12] = chain[write_pointer][next-:12]; //新块的next指向旧块的next
-                            chain[new_block][sa-:12] = chain[write_pointer][sa-:12]; //新块的start_address等于旧块的start_address
-                            chain[new_block][size-:12] = w_size; //新块的size等于新分配的size
+                            chain[new_block][prev-:addr_lines+1] = write_pointer; //新块的prev指向旧块节点序号
+                            chain[new_block][next-:addr_lines+1] = chain[write_pointer][next-:addr_lines+1]; //新块的next指向旧块的next
+                            chain[new_block][sa-:addr_lines+1] = chain[write_pointer][sa-:addr_lines+1]; //新块的start_address等于旧块的start_address
+                            chain[new_block][size-:addr_lines+1] = w_size; //新块的size等于新分配的size
                             chain[new_block][state] = 1; //新块的state等于1
 
-                            chain[write_pointer][next-:12] = new_block; //旧块的prev不变，next指向新块节点序号
-                            chain[write_pointer][size-:12] = chain[write_pointer][size-:12] - w_size; //旧块的size等于原size减去被切割的长度
-                            chain[write_pointer][sa-:12] = chain[new_block][sa-:12] + w_size; //旧块的start_address等于新块start_address+size 
+                            chain[write_pointer][next-:addr_lines+1] = new_block; //旧块的prev不变，next指向新块节点序号
+                            chain[write_pointer][size-:addr_lines+1] = chain[write_pointer][size-:addr_lines+1] - w_size; //旧块的size等于原size减去被切割的长度
+                            chain[write_pointer][sa-:addr_lines+1] = chain[new_block][sa-:addr_lines+1] + w_size; //旧块的start_address等于新块start_address+size 
 
-                            write_address = chain[new_block][sa-:12]; //输出起始地址
+                            write_address = chain[new_block][sa-:addr_lines+1]; //输出起始地址
                             addr_left = w_size - 1; //记录剩余输入地址位数
                             writing = 1; //标记开始写入
 
@@ -212,7 +215,7 @@ module cache_manager
                     
                     end
                     else begin
-                        write_pointer = chain[write_pointer][next-:12]; //寻找下一个内存块
+                        write_pointer = chain[write_pointer][next-:addr_lines+1]; //寻找下一个内存块
                     end
                 end
                 else write_done = write_done;
@@ -221,6 +224,88 @@ module cache_manager
     end
 
 //----------read-out-package----------
+    //Prepared
+    always @(posedge clk) begin
+        prepared_j = queue_num[q0];
+        for(prepared_i=q0;prepared_i<q0+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_0_prepared = 0;
+        else port_0_prepared = 1;
+
+        prepared_j = queue_num[q1];
+        for(prepared_i=q1;prepared_i<q1+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_1_prepared = 0;
+        else port_1_prepared = 1;
+        
+        prepared_j = queue_num[q2];
+        for(prepared_i=q2;prepared_i<q2+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_2_prepared = 0;
+        else port_2_prepared = 1;
+
+        prepared_j = queue_num[q3];
+        for(prepared_i=q3;prepared_i<q3+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_3_prepared = 0;
+        else port_3_prepared = 1;
+
+        prepared_j = queue_num[q4];
+        for(prepared_i=q4;prepared_i<q4+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_4_prepared = 0;
+        else port_4_prepared = 1;
+
+        prepared_j = queue_num[q5];
+        for(prepared_i=q5;prepared_i<q5+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_5_prepared = 0;
+        else port_5_prepared = 1;
+
+        prepared_j = queue_num[q6];
+        for(prepared_i=q6;prepared_i<q6+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_6_prepared = 0;
+        else port_6_prepared = 1;
+
+        prepared_j = queue_num[q7];
+        for(prepared_i=q7;prepared_i<q7+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_7_prepared = 0;
+        else port_7_prepared = 1;
+
+        prepared_j = queue_num[q8];
+        for(prepared_i=q8;prepared_i<q8+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_8_prepared = 0;
+        else port_8_prepared = 1;
+
+        prepared_j = queue_num[q9];
+        for(prepared_i=q9;prepared_i<q9+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_9_prepared = 0;
+        else port_9_prepared = 1;
+
+        prepared_j = queue_num[q10];
+        for(prepared_i=q10;prepared_i<q10+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_10_prepared = 0;
+        else port_10_prepared = 1;
+
+        prepared_j = queue_num[q11];
+        for(prepared_i=q11;prepared_i<q11+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_11_prepared = 0;
+        else port_11_prepared = 1;
+
+        prepared_j = queue_num[q12];
+        for(prepared_i=q12;prepared_i<q12+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_12_prepared = 0;
+        else port_12_prepared = 1;
+
+        prepared_j = queue_num[q13];
+        for(prepared_i=q13;prepared_i<q13+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_13_prepared = 0;
+        else port_13_prepared = 1;
+
+        prepared_j = queue_num[q14];
+        for(prepared_i=q14;prepared_i<q14+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_14_prepared = 0;
+        else port_14_prepared = 1;
+
+        prepared_j = queue_num[q15];
+        for(prepared_i=q15;prepared_i<q15+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_15_prepared = 0;
+        else port_15_prepared = 1;
+    end
 
     //Port0
     always @(posedge clk) begin //正在传输地址
@@ -233,8 +318,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_0_rea && port_0_reading == 0) begin
             if( queue_num[ port_0_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_0_addr = chain[ queue[ port_0_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_0_addr_left = chain[ queue[ port_0_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_0_addr = chain[ queue[ port_0_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_0_addr_left = chain[ queue[ port_0_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_0_reading = 1; //允许读出
                 
                 chain[ queue[ port_0_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -258,8 +343,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_1_rea && port_1_reading == 0) begin
             if( queue_num[ 8+port_1_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_1_addr = chain[ queue[ 8+port_1_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_1_addr_left = chain[ queue[ 8+port_1_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_1_addr = chain[ queue[ 8+port_1_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_1_addr_left = chain[ queue[ 8+port_1_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_1_reading = 1; //允许读出
                 
                 chain[ queue[ 8+port_1_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -283,8 +368,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_2_rea && port_2_reading == 0) begin
             if( queue_num[ 16+port_2_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_2_addr = chain[ queue[ 16+port_2_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_2_addr_left = chain[ queue[ 16+port_2_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_2_addr = chain[ queue[ 16+port_2_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_2_addr_left = chain[ queue[ 16+port_2_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_2_reading = 1; //允许读出
                 
                 chain[ queue[ 16+port_2_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -308,8 +393,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_3_rea && port_3_reading == 0) begin
             if( queue_num[ 24+port_3_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_3_addr = chain[ queue[ 24+port_3_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_3_addr_left = chain[ queue[ 24+port_3_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_3_addr = chain[ queue[ 24+port_3_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_3_addr_left = chain[ queue[ 24+port_3_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_3_reading = 1; //允许读出
                 
                 chain[ queue[ 24+port_3_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -333,8 +418,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_4_rea && port_4_reading == 0) begin
             if( queue_num[ 32+port_4_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_4_addr = chain[ queue[ 32+port_4_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_4_addr_left = chain[ queue[ 32+port_4_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_4_addr = chain[ queue[ 32+port_4_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_4_addr_left = chain[ queue[ 32+port_4_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_4_reading = 1; //允许读出
                 
                 chain[ queue[ 32+port_4_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -358,8 +443,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_5_rea && port_5_reading == 0) begin
             if( queue_num[ 40+port_5_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_5_addr = chain[ queue[ 40+port_5_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_5_addr_left = chain[ queue[ 40+port_5_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_5_addr = chain[ queue[ 40+port_5_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_5_addr_left = chain[ queue[ 40+port_5_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_5_reading = 1; //允许读出
                 
                 chain[ queue[ 40+port_5_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -383,8 +468,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_6_rea && port_6_reading == 0) begin
             if( queue_num[ 48+port_6_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_6_addr = chain[ queue[ 48+port_6_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_6_addr_left = chain[ queue[ 48+port_6_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_6_addr = chain[ queue[ 48+port_6_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_6_addr_left = chain[ queue[ 48+port_6_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_6_reading = 1; //允许读出
                 
                 chain[ queue[ 48+port_6_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -408,8 +493,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_7_rea && port_7_reading == 0) begin
             if( queue_num[ 56+port_7_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_7_addr = chain[ queue[ 56+port_7_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_7_addr_left = chain[ queue[ 56+port_7_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_7_addr = chain[ queue[ 56+port_7_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_7_addr_left = chain[ queue[ 56+port_7_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_7_reading = 1; //允许读出
                 
                 chain[ queue[ 56+port_7_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -433,8 +518,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_8_rea && port_8_reading == 0) begin
             if( queue_num[ 64+port_8_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_8_addr = chain[ queue[ 64+port_8_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_8_addr_left = chain[ queue[ 64+port_8_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_8_addr = chain[ queue[ 64+port_8_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_8_addr_left = chain[ queue[ 64+port_8_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_8_reading = 1; //允许读出
                 
                 chain[ queue[ 64+port_8_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -458,8 +543,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_9_rea && port_9_reading == 0) begin
             if( queue_num[ 72+port_9_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_9_addr = chain[ queue[ 72+port_9_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_9_addr_left = chain[ queue[ 72+port_9_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_9_addr = chain[ queue[ 72+port_9_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_9_addr_left = chain[ queue[ 72+port_9_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_9_reading = 1; //允许读出
                 
                 chain[ queue[ 72+port_9_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -483,8 +568,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_10_rea && port_10_reading == 0) begin
             if( queue_num[ 80+port_10_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_10_addr = chain[ queue[ 80+port_10_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_10_addr_left = chain[ queue[ 80+port_10_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_10_addr = chain[ queue[ 80+port_10_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_10_addr_left = chain[ queue[ 80+port_10_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_10_reading = 1; //允许读出
                 
                 chain[ queue[ 80+port_10_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -508,8 +593,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_11_rea && port_11_reading == 0) begin
             if( queue_num[ 88+port_11_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_11_addr = chain[ queue[ 88+port_11_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_11_addr_left = chain[ queue[ 88+port_11_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_11_addr = chain[ queue[ 88+port_11_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_11_addr_left = chain[ queue[ 88+port_11_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_11_reading = 1; //允许读出
                 
                 chain[ queue[ 88+port_11_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -533,8 +618,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_12_rea && port_12_reading == 0) begin
             if( queue_num[ 96+port_12_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_12_addr = chain[ queue[ 96+port_12_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_12_addr_left = chain[ queue[ 96+port_12_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_12_addr = chain[ queue[ 96+port_12_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_12_addr_left = chain[ queue[ 96+port_12_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_12_reading = 1; //允许读出
                 
                 chain[ queue[ 96+port_12_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -558,8 +643,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_13_rea && port_13_reading == 0) begin
             if( queue_num[ 104+port_13_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_13_addr = chain[ queue[ 104+port_13_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_13_addr_left = chain[ queue[ 104+port_13_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_13_addr = chain[ queue[ 104+port_13_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_13_addr_left = chain[ queue[ 104+port_13_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_13_reading = 1; //允许读出
                 
                 chain[ queue[ 104+port_13_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -583,8 +668,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_14_rea && port_14_reading == 0) begin
             if( queue_num[ 112+port_14_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_14_addr = chain[ queue[ 112+port_14_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_14_addr_left = chain[ queue[ 112+port_14_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_14_addr = chain[ queue[ 112+port_14_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_14_addr_left = chain[ queue[ 112+port_14_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_14_reading = 1; //允许读出
                 
                 chain[ queue[ 112+port_14_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -608,8 +693,8 @@ module cache_manager
     always @(posedge clk) begin
         if (port_15_rea && port_15_reading == 0) begin
             if( queue_num[ 120+port_15_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
-                port_15_addr = chain[ queue[ 120+port_15_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_15_addr_left = chain[ queue[ 120+port_15_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_15_addr = chain[ queue[ 120+port_15_priority ][0] ][sa-:addr_lines+1]; //输出队列头项的起始地址
+                port_15_addr_left = chain[ queue[ 120+port_15_priority ][0] ][size-:addr_lines+1] - 1; //标记剩余位数
                 port_15_reading = 1; //允许读出
                 
                 chain[ queue[ 120+port_15_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -629,15 +714,15 @@ module cache_manager
         deallocate_pointer = 0;
         for(deallocate_loop=0;deallocate_loop<units;deallocate_loop=deallocate_loop+1) begin  //当chain[k]的next不等于null时继续
             
-            if(chain[deallocate_pointer][24] == 0 && chain[ chain[deallocate_pointer][48:37] ][24] == 0 && available[deallocate_pointer] == 0 && available[ chain[deallocate_pointer][48:37] ] == 0) begin //当发现当前内存块和下一个内存块的state都为0，且两个块都正在被使用时，开始吞并
+            if(chain[deallocate_pointer][state] == 0 && chain[ chain[deallocate_pointer][next-:addr_lines+1] ][24] == 0 && available[deallocate_pointer] == 0 && available[ chain[deallocate_pointer][48:37] ] == 0) begin //当发现当前内存块和下一个内存块的state都为0，且两个块都正在被使用时，开始吞并
                 
-                available[ chain[deallocate_pointer][48:37] ] = 1; //下一个内存块的链表位置空出
-                chain[deallocate_pointer][23:12] = chain[deallocate_pointer][23:12] + chain[ chain[deallocate_pointer][48:37] ][23:12]; //当前块的size加上下一个块的size
-                chain[deallocate_pointer][48:37] = chain[ chain[deallocate_pointer][48:37] ][48:37]; //当前块的next等于下一个块的next
+                available[ chain[deallocate_pointer][next-:addr_lines+1] ] = 1; //下一个内存块的链表位置空出
+                chain[deallocate_pointer][size-:addr_lines] = chain[deallocate_pointer][size-:addr_lines] + chain[ chain[deallocate_pointer][next-:addr_lines] ][size-:addr_lines]; //当前块的size加上下一个块的size
+                chain[deallocate_pointer][next-:addr_lines] = chain[ chain[deallocate_pointer][next-:addr_lines] ][next-:addr_lines]; //当前块的next等于下一个块的next
                 
             end
-            else if( chain[deallocate_pointer][48:37] == 12'hFFF ) deallocate_loop = units+1; //如果next为null则停止循环
-            deallocate_pointer = chain[deallocate_pointer][48:37]; //寻找下一个内存块节点序号
+            else if( chain[deallocate_pointer][next-:addr_lines] == 17'hFFFFF ) deallocate_loop = units+1; //如果next为null则停止循环
+            deallocate_pointer = chain[deallocate_pointer][next-:addr_lines]; //寻找下一个内存块节点序号
         end
     end
 
