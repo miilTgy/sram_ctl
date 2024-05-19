@@ -133,10 +133,10 @@ module cache_manager
 
             //初始化链表头chain[0]
             chain[0][sa-:addr_lines] = 1'b0; //start_address = 0
-            chain[0][size-:addr_lines] = 17'hFFFFF; //size = 4096
+            chain[0][size-:addr_lines] = 17'h1FFFF; //size = 4096
             chain[0][state] = 1'b0;  // state = 0
-            chain[0][prev-:addr_lines] = 17'hFFFFF; // prev = null
-            chain[0][next-:addr_lines] = 17'hFFFFF; //next = null
+            chain[0][prev-:addr_lines] = 17'h1FFFF; // prev = null
+            chain[0][next-:addr_lines] = 17'h1FFFF; //next = null
             available[0] = 0; //链表头已使用
             new_block = 1; //从chain[1]开始添加节点
 
@@ -721,7 +721,7 @@ module cache_manager
                 chain[deallocate_pointer][next-:addr_lines] = chain[ chain[deallocate_pointer][next-:addr_lines] ][next-:addr_lines]; //当前块的next等于下一个块的next
                 
             end
-            else if( chain[deallocate_pointer][next-:addr_lines] == 17'hFFFFF ) deallocate_loop = units+1; //如果next为null则停止循环
+            else if( chain[deallocate_pointer][next-:addr_lines] == 17'h1FFFF ) deallocate_loop = units+1; //如果next为null则停止循环
             deallocate_pointer = chain[deallocate_pointer][next-:addr_lines]; //寻找下一个内存块节点序号
         end
     end
