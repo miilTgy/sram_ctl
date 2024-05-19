@@ -3,7 +3,7 @@ module datasg #(
     // [x] Make parameters
     parameter num_of_ports = 16,
     parameter sg_data_width = 64,
-    parameter sg_address_width = 12,
+    parameter sg_address_width = 16,
     parameter sg_des_width = 4,
     parameter sg_priority_width = 3,
     parameter sg_pack_length_width = 7
