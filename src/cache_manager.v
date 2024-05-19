@@ -45,22 +45,22 @@ module cache_manager
     //package_output_related_declaration
 
     //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
-    output reg [addr_lines:0] port_0_addr = 0, input [3:0] port_0_priority, input port_0_rea, output reg port_0_reading = 0,
-    output reg [addr_lines:0] port_1_addr = 0, input [3:0] port_1_priority, input port_1_rea, output reg port_1_reading = 0,
-    output reg [addr_lines:0] port_2_addr = 0, input [3:0] port_2_priority, input port_2_rea, output reg port_2_reading = 0,
-    output reg [addr_lines:0] port_3_addr = 0, input [3:0] port_3_priority, input port_3_rea, output reg port_3_reading = 0,
-    output reg [addr_lines:0] port_4_addr = 0, input [3:0] port_4_priority, input port_4_rea, output reg port_4_reading = 0,
-    output reg [addr_lines:0] port_5_addr = 0, input [3:0] port_5_priority, input port_5_rea, output reg port_5_reading = 0,
-    output reg [addr_lines:0] port_6_addr = 0, input [3:0] port_6_priority, input port_6_rea, output reg port_6_reading = 0,
-    output reg [addr_lines:0] port_7_addr = 0, input [3:0] port_7_priority, input port_7_rea, output reg port_7_reading = 0,
-    output reg [addr_lines:0] port_8_addr = 0, input [3:0] port_8_priority, input port_8_rea, output reg port_8_reading = 0,
-    output reg [addr_lines:0] port_9_addr = 0, input [3:0] port_9_priority, input port_9_rea, output reg port_9_reading = 0,
-    output reg [addr_lines:0] port_10_addr = 0, input [3:0] port_10_priority, input port_10_rea, output reg port_10_reading = 0,
-    output reg [addr_lines:0] port_11_addr = 0, input [3:0] port_11_priority, input port_11_rea, output reg port_11_reading = 0,
-    output reg [addr_lines:0] port_12_addr = 0, input [3:0] port_12_priority, input port_12_rea, output reg port_12_reading = 0,
-    output reg [addr_lines:0] port_13_addr = 0, input [3:0] port_13_priority, input port_13_rea, output reg port_13_reading = 0,
-    output reg [addr_lines:0] port_14_addr = 0, input [3:0] port_14_priority, input port_14_rea, output reg port_14_reading = 0,
-    output reg [addr_lines:0] port_15_addr = 0, input [3:0] port_15_priority, input port_15_rea, output reg port_15_reading = 0
+    output reg [addr_lines:0] port_0_addr = 0, input [3:0] port_0_priority, input port_0_rea, output reg port_0_reading = 0, output reg port_0_prepared = 0,
+    output reg [addr_lines:0] port_1_addr = 0, input [3:0] port_1_priority, input port_1_rea, output reg port_1_reading = 0, output reg port_1_prepared = 0,
+    output reg [addr_lines:0] port_2_addr = 0, input [3:0] port_2_priority, input port_2_rea, output reg port_2_reading = 0, output reg port_2_prepared = 0,
+    output reg [addr_lines:0] port_3_addr = 0, input [3:0] port_3_priority, input port_3_rea, output reg port_3_reading = 0, output reg port_3_prepared = 0,
+    output reg [addr_lines:0] port_4_addr = 0, input [3:0] port_4_priority, input port_4_rea, output reg port_4_reading = 0, output reg port_4_prepared = 0,
+    output reg [addr_lines:0] port_5_addr = 0, input [3:0] port_5_priority, input port_5_rea, output reg port_5_reading = 0, output reg port_5_prepared = 0,
+    output reg [addr_lines:0] port_6_addr = 0, input [3:0] port_6_priority, input port_6_rea, output reg port_6_reading = 0, output reg port_6_prepared = 0,
+    output reg [addr_lines:0] port_7_addr = 0, input [3:0] port_7_priority, input port_7_rea, output reg port_7_reading = 0, output reg port_7_prepared = 0,
+    output reg [addr_lines:0] port_8_addr = 0, input [3:0] port_8_priority, input port_8_rea, output reg port_8_reading = 0, output reg port_8_prepared = 0,
+    output reg [addr_lines:0] port_9_addr = 0, input [3:0] port_9_priority, input port_9_rea, output reg port_9_reading = 0, output reg port_9_prepared = 0,
+    output reg [addr_lines:0] port_10_addr = 0, input [3:0] port_10_priority, input port_10_rea, output reg port_10_reading = 0, output reg port_10_prepared = 0,
+    output reg [addr_lines:0] port_11_addr = 0, input [3:0] port_11_priority, input port_11_rea, output reg port_11_reading = 0, output reg port_11_prepared = 0,
+    output reg [addr_lines:0] port_12_addr = 0, input [3:0] port_12_priority, input port_12_rea, output reg port_12_reading = 0, output reg port_12_prepared = 0,
+    output reg [addr_lines:0] port_13_addr = 0, input [3:0] port_13_priority, input port_13_rea, output reg port_13_reading = 0, output reg port_13_prepared = 0,
+    output reg [addr_lines:0] port_14_addr = 0, input [3:0] port_14_priority, input port_14_rea, output reg port_14_reading = 0, output reg port_14_prepared = 0,
+    output reg [addr_lines:0] port_15_addr = 0, input [3:0] port_15_priority, input port_15_rea, output reg port_15_reading = 0, output reg port_15_prepared = 0
 
 );
 
@@ -99,6 +99,8 @@ module cache_manager
     integer out_loop_13;
     integer out_loop_14;
     integer out_loop_15;
+    integer prepared_i;
+    integer prepared_j;
 
 
     //输出端口剩余位数
@@ -222,6 +224,88 @@ module cache_manager
     end
 
 //----------read-out-package----------
+    //Prepared
+    always @(posedge clk) begin
+        prepared_j = queue_num[q0];
+        for(prepared_i=q0;prepared_i<q0+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_0_prepared = 0;
+        else port_0_prepared = 1;
+
+        prepared_j = queue_num[q1];
+        for(prepared_i=q1;prepared_i<q1+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_1_prepared = 0;
+        else port_1_prepared = 1;
+        
+        prepared_j = queue_num[q2];
+        for(prepared_i=q2;prepared_i<q2+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_2_prepared = 0;
+        else port_2_prepared = 1;
+
+        prepared_j = queue_num[q3];
+        for(prepared_i=q3;prepared_i<q3+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_3_prepared = 0;
+        else port_3_prepared = 1;
+
+        prepared_j = queue_num[q4];
+        for(prepared_i=q4;prepared_i<q4+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_4_prepared = 0;
+        else port_4_prepared = 1;
+
+        prepared_j = queue_num[q5];
+        for(prepared_i=q5;prepared_i<q5+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_5_prepared = 0;
+        else port_5_prepared = 1;
+
+        prepared_j = queue_num[q6];
+        for(prepared_i=q6;prepared_i<q6+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_6_prepared = 0;
+        else port_6_prepared = 1;
+
+        prepared_j = queue_num[q7];
+        for(prepared_i=q7;prepared_i<q7+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_7_prepared = 0;
+        else port_7_prepared = 1;
+
+        prepared_j = queue_num[q8];
+        for(prepared_i=q8;prepared_i<q8+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_8_prepared = 0;
+        else port_8_prepared = 1;
+
+        prepared_j = queue_num[q9];
+        for(prepared_i=q9;prepared_i<q9+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_9_prepared = 0;
+        else port_9_prepared = 1;
+
+        prepared_j = queue_num[q10];
+        for(prepared_i=q10;prepared_i<q10+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_10_prepared = 0;
+        else port_10_prepared = 1;
+
+        prepared_j = queue_num[q11];
+        for(prepared_i=q11;prepared_i<q11+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_11_prepared = 0;
+        else port_11_prepared = 1;
+
+        prepared_j = queue_num[q12];
+        for(prepared_i=q12;prepared_i<q12+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_12_prepared = 0;
+        else port_12_prepared = 1;
+
+        prepared_j = queue_num[q13];
+        for(prepared_i=q13;prepared_i<q13+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_13_prepared = 0;
+        else port_13_prepared = 1;
+
+        prepared_j = queue_num[q14];
+        for(prepared_i=q14;prepared_i<q14+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_14_prepared = 0;
+        else port_14_prepared = 1;
+
+        prepared_j = queue_num[q15];
+        for(prepared_i=q15;prepared_i<q15+7;prepared_i=prepared_i+1) prepared_j = prepared_j || queue_num[prepared_i+1];
+        if( prepared_j == 0) port_15_prepared = 0;
+        else port_15_prepared = 1;
+    end
 
     //Port0
     always @(posedge clk) begin //正在传输地址
