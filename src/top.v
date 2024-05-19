@@ -101,8 +101,11 @@ module top #(
 
     //ports for sram
     wire wea_sram;
-    wire [63:0] dina;
     wire [16:0] addra;
+    wire [63:0] dina;
+    wire [16:0] addrb;
+    wire [63:0] doutb;
+    
 
 
     cache_manager u_cache_manager(
@@ -222,10 +225,10 @@ module top #(
         .wea(wea_sram),
         .addra(addra),
         .dina(dina),
-        .clkb(),
-        .enb(),
-        .addrb(),
-        .doutb()
+        .clkb(clk),
+        .enb(1'b1),
+        .addrb(addrb),
+        .doutb(doutb)
     )
 
 
