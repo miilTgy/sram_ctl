@@ -17,7 +17,8 @@ module top #(
         parameter num_of_priorities=8,
         parameter des_port_width  = 4,
         parameter address_width   = 17,
-        parameter wrr_weight_width= 5
+        parameter wrr_weight_width= 5,
+        parameter pack_length_width  = 8
     ) (
         // ports
         input                                           sp0_wrr1,
@@ -85,7 +86,7 @@ module top #(
     wire [3:0] arbiter_des_port_out, pre_des_port_out;
     wire [3:0] pre_selected;
     wire [priority_width-1:0] priority_out;
-    wire [des_port_width-1:0] ab_pack_length_out, pre_pack_length_out;
+    wire [pack_length_width-1:0] ab_pack_length_out, pre_pack_length_out;
     reg  [address_width-1:0] address_in;
 
     // ports for rd_arbiter
