@@ -46,8 +46,6 @@ module top #(
     wire [16:0] write_address = 0; //写入地址
     wire writing = 0; //正在传输写入地址时拉高
 
-    //package_output_related_declaration
-
     //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
     wire [16:0] port_0_addr = 0; wire [3:0] port_0_priority; wire port_0_rea;  wire port_0_reading = 0; wire port_0_prepared;
     wire [16:0] port_1_addr = 0; wire [3:0] port_1_priority; wire port_1_rea;  wire port_1_reading = 0; wire port_1_prepared;
@@ -100,6 +98,11 @@ module top #(
     wire [address_width-1:0] address_read1, address_read2;
     wire rd_request1, rd_request2;
     wire enb;
+
+    //ports for sram
+    wire wea_sram;
+    wire [63:0] dina;
+    wire [16:0] addra;
 
 
     cache_manager u_cache_manager(
@@ -182,9 +185,9 @@ module top #(
         .request                    (wea),
         .wr_priority                (priority),
         .des_port                   (dest_port),
-        .address_write              (),
-        .data_write                 (),
-        .write_enable1              (),
+        .address_write              (addra),
+        .data_write                 (dina),
+        .write_enable1              (wea_sram),
         pack_length                 (w_size),
     );
 
@@ -214,11 +217,11 @@ module top #(
     );
 
     sram u_sram(
-        .clka(),
-        .ena(),
-        .wea(),
-        .addra(),
-        .dina(),
+        .clka(clk),
+        .ena(1'b1),
+        .wea(wea_sram),
+        .addra(addra),
+        .dina(dina),
         .clkb(),
         .enb(),
         .addrb(),
