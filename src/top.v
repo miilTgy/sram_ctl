@@ -11,21 +11,25 @@ module top #(
         // parameters
         parameter num_of_ports    = 16,
         parameter data_width      = 64,
-        parameter num_of_priority = 8
+        parameter num_of_priority = 8,
+        parameter priority_width  = 3,
+        parameter num_of_priorities=8,
+        parameter des_port_width  = 7,
+        parameter address_width   = 12
     ) (
         // ports
-        input                               wr_sop      [num_of_ports-1:0],
-        input                               wr_eop      [num_of_ports-1:0],
-        input                               wr_vld      [num_of_ports-1:0],
-        input       [data_width-1:0]        wr_data     [num_of_ports-1:0],
-        input       [num_of_priority-1:0]   ready       [num_of_ports-1:0],
-
-        output  reg                         rd_sop      [num_of_ports-1:0],
-        output  reg                         rd_eop      [num_of_ports-1:0],
-        output  reg                         rd_vld      [num_of_ports-1:0],
-        output  reg [data_width-1:0]        rd_data     [num_of_ports-1:0],
-        output  reg [num_of_priority-1:0]   full        [num_of_ports-1:0],
-        output  reg [num_of_priority-1:0]   almost_full [num_of_ports-1:0]
+        input                                           sp0_wrr1,
+        input       [num_of_ports-1:0]                  wr_sop,
+        input       [num_of_ports-1:0]                  wr_eop,
+        input       [num_of_ports-1:0]                  wr_vld,
+        input       [data_width*num_of_ports-1:0]       wr_data,
+        input       [num_of_priority*num_of_ports-1:0]  ready,
+        output  reg [num_of_ports-1:0]                  rd_sop,
+        output  reg [num_of_ports-1:0]                  rd_eop,
+        output  reg [num_of_ports-1:0]                  rd_vld,
+        output  reg [data_width*num_of_ports-1:0]       rd_data,
+        output  reg [num_of_priority*num_of_ports-1:0]  full,
+        output  reg [num_of_priority*num_of_ports-1:0]  almost_full
     );
 
 //cache_manager_inst
@@ -62,6 +66,41 @@ module top #(
     reg [11:0] port_14_addr = 0; reg [3:0] port_14_priority; reg port_14_rea;  reg port_14_reading = 0;
     reg [11:0] port_15_addr = 0; reg [3:0] port_15_priority; reg port_15_rea;  reg port_15_reading = 0;
 
+    // ports for fifo
+    reg in_clk;
+    wire [fifo_data_width-1:0] wr_data_unpack [num_of_ports-1:0]; // packed
+    wire [fifo_data_width*num_of_ports-1:0] out_data;
+
+    // ports for between fifo and write_arbiter
+    wire [num_of_ports-1:0] sop, eop, vld;
+    wire [num_of_ports-1:0] overflow;
+    wire [num_of_ports-1:0] ready_between;
+    wire [num_of_ports-1:0] next_data;
+    wire [fifo_data_width-1:0] between_data_unpack [num_of_ports-1:0]; // 接到fifo的out_data
+
+    // ports for write_arbiter
+    wire busy;
+    wire [arbiter_data_width-1:0] data_out; // packed
+    wire [fifo_data_width*num_of_ports-1:0] data_in_p; // packed
+    wire [3:0] arbiter_des_port_out, pre_des_port_out;
+    wire [3:0] pre_selected;
+    wire [priority_width-1:0] priority_out;
+    wire [des_port_width-1:0] ab_pack_length_out, pre_pack_length_out;
+    reg  [address_width-1:0] address_in;
+
+    // ports for rd_arbiter
+    reg [num_of_priorities-1:0] prepared;
+    reg [wrr_weight_width-1:0] wrr_weight;
+    wire [num_of_priorities-1:0] next_data2;
+
+    reg [arbiter_data_width-1:0] data_read;
+    reg last1, last2;
+    reg [address_width-1:0] address_to_read1, address_to_read2;
+    wire [address_width-1:0] address_read1, address_read2;
+    wire rd_request1, rd_request2;
+    wire enb;
+
+
     cache_manager u_cache_manager(
         .rst(rst),
         .clk(clk),
@@ -90,5 +129,81 @@ module top #(
 
 
     );
+    fifo u_fifo[num_of_ports-1:0] (
+        .rst                        (rst),
+        .in_clk                     (in_clk),
+        .clk                        (clk),
+        .next_data                  (next_data),
+        .wr_sop                     (wr_sop),
+        .wr_eop                     (wr_eop),
+        .wr_vld                     (wr_vld),
+        .wr_data                    (wr_data),
+        .ready                      (ready_between),
+        .overflow                   (overflow),
+        .sop                        (sop),
+        .eop                        (eop),
+        .vld                        (vld),
+        .out_data                   (out_data)
+    );
+
+    write_arbiter write_arbiter_tt1 (
+        .rst                        (rst),
+        .clk                        (clk),
+        .sp0_wrr1                   (sp0_wrr1),
+        .ready                      (ready_between),
+        .sop                        (sop),
+        .eop                        (eop),
+        .vld                        (vld),
+        .data_in_p                  (data_in_p),
+        .busy                       (busy),
+        .selected_data_out          (data_out),
+        .arbiter_des_port_out       (arbiter_des_port_out),
+        .ab_pack_length_out         (ab_pack_length_out),
+        .next_data                  (next_data),
+        .pre_selected               (pre_selected),
+        .pre_des_port_out           (pre_des_port_out),
+        .pre_pack_length_out        (pre_pack_length_out),
+        .transfering                (transfering),
+        .priority_out               (priority_out)
+    );
+
+    datasg datasg_ttt (
+        .rst                        (rst),
+        .clk                        (clk),
+        .transfering                (transfering),
+        .busy                       (busy),
+        .eop                        (eop),
+        .data_in                    (data_out),
+        .address_in                 (address_in),
+        .priority_in                (priority_out),
+        .des_port_in                (pre_des_port_out),
+        .pack_length_in             (pre_pack_length_out)
+    );
+
+    read_arbiter read_arbiter_tt (
+        .rst                        (rst),
+        .clk                        (clk),
+        .sp0_wrr1                   (sp0_wrr1),
+        .ready                      (ready),
+        .prepared                   (prepared),
+        .wrr_weight                 (wrr_weight),
+        .rd_data                    (rd_data),
+        .rd_sop                     (rd_sop),
+        .rd_vld                     (rd_vld),
+        .rd_eop                     (rd_eop),
+        .next_data                  (next_data),
+        .next_data2                 (next_data2),
+        .data_read                  (data_read),
+        .last1                      (last1),
+        .address_to_read1           (address_to_read1),
+        .address_read1              (address_read1),
+        .last2                      (last2),
+        .address_to_read2           (address_to_read2),
+        .address_read2              (address_read2),
+        .rd_request1                (rd_request1),
+        .rd_request2                (rd_request2),
+        .enb                        (enb)
+    );
+
 
 endmodule
