@@ -83,3 +83,7 @@ iclean: a.out
 cache:
 	iverilog ./src/cache_manager.v ./src/cache_manager_tb.v 
 	./a.out
+
+sram:
+	iverilog ./src/sram.v ./src/sram/simulation/blk_mem_gen_v8_4.v src/sram/sim/blk_mem_gen_0.v
+	./a.out
