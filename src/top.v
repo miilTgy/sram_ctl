@@ -92,6 +92,7 @@ module top #(
     wire [num_of_priorities-1:0] prepared; // TODO
     reg [wrr_weight_width-1:0] wrr_weight;
     wire [num_of_priorities-1:0] next_data2;
+    assign {port_0_rea,port_1_rea,port_2_rea,port_3_rea,port_4_rea,port_5_rea,port_6_rea,port_7_rea,port_8_rea,port_9_rea,port_10_rea,port_11_rea,port_12_rea,port_13_rea,port_14_rea,port_15_rea} = next_data2;
 
     reg [arbiter_data_width-1:0] data_read;
     reg last1, last2;
@@ -174,10 +175,17 @@ module top #(
         .busy                       (busy),
         .eop                        (eop),
         .data_in                    (data_out),
-        .address_in                 (address_in),
-        .priority_in                (priority_out),
+        .address_in                 (write_address),
+        .priority_in                (priority),
         .des_port_in                (pre_des_port_out),
-        .pack_length_in             (pre_pack_length_out)
+        .pack_length_in             (pre_pack_length_out),
+        .request                    (wea),
+        .wr_priority                (priority),
+        .des_port                   (dest_port),
+        .address_write              (),
+        .data_write                 (),
+        .write_enable1              (),
+        pack_length                 (w_size),
     );
 
     read_arbiter read_arbiter_tt[num_of_ports-1:0] (

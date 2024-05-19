@@ -11,6 +11,23 @@ module top_tb ();
     parameter address_width = 12;
 
 
+
+// instance
+    top top_in (
+        .sp0_wrr1
+        .wr_sop
+        .wr_eop
+        .wr_vld
+        .wr_data
+        .ready
+        .rd_sop
+        .rd_eop
+        .rd_vld
+        .rd_data
+        .full
+        .almost_full
+    );
+
     always #1 clk = ~clk;
     always #16 in_clk = ~in_clk;
     integer iii;
