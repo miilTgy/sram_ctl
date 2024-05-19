@@ -89,7 +89,7 @@ module top #(
     reg  [address_width-1:0] address_in;
 
     // ports for rd_arbiter
-    reg [num_of_priorities-1:0] prepared;
+    wire [num_of_priorities-1:0] prepared; // TODO
     reg [wrr_weight_width-1:0] wrr_weight;
     wire [num_of_priorities-1:0] next_data2;
 
@@ -180,7 +180,7 @@ module top #(
         .pack_length_in             (pre_pack_length_out)
     );
 
-    read_arbiter read_arbiter_tt (
+    read_arbiter read_arbiter_tt[num_of_ports-1:0] (
         .rst                        (rst),
         .clk                        (clk),
         .sp0_wrr1                   (sp0_wrr1),
@@ -191,7 +191,7 @@ module top #(
         .rd_sop                     (rd_sop),
         .rd_vld                     (rd_vld),
         .rd_eop                     (rd_eop),
-        .next_data                  (next_data),
+        .next_data                  ( ),
         .next_data2                 (next_data2),
         .data_read                  (data_read),
         .last1                      (last1),

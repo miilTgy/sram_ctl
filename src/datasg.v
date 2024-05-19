@@ -29,7 +29,8 @@ module datasg #(
     output  wire                                write_enable1,
     output  wire                                write_enable2,
     output  wire                                write_enable3,
-    output  wire                                write_enable4
+    output  wire                                write_enable4,
+    output  wire    [ab_pack_length_out-1:0]    pack_length
 );
     // [x] Complete this
     reg writting;
