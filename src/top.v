@@ -32,39 +32,39 @@ module top #(
         output  reg [num_of_priority*num_of_ports-1:0]  almost_full
     );
 
-//cache_manager_inst
 
-    reg rst;
-    reg clk;
 
-    //package_input_related_declaration
+    wire rst;
+    wire clk;
 
-    reg wea; //write_enable
-    reg [7:0] w_size; //写入包长度
-    reg [2:0] priority; //该数据包的优先级，0~7
-    reg [3:0] dest_port; //该数据包的目标端口;0~15
-    reg [16:0] write_address = 0; //写入地址
-    reg writing = 0; //正在传输写入地址时拉高
+    //ports for cache_manager
+
+    wire wea; //write_enable
+    wire [7:0] w_size; //写入包长度
+    wire [2:0] priority; //该数据包的优先级，0~7
+    wire [3:0] dest_port; //该数据包的目标端口;0~15
+    wire [16:0] write_address = 0; //写入地址
+    wire writing = 0; //正在传输写入地址时拉高
 
     //package_output_related_declaration
 
     //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
-    reg [16:0] port_0_addr = 0; reg [3:0] port_0_priority; reg port_0_rea;  reg port_0_reading = 0; reg port_0_prepared;
-    reg [16:0] port_1_addr = 0; reg [3:0] port_1_priority; reg port_1_rea;  reg port_1_reading = 0; reg port_1_prepared;
-    reg [16:0] port_2_addr = 0; reg [3:0] port_2_priority; reg port_2_rea;  reg port_2_reading = 0; reg port_2_prepared;
-    reg [16:0] port_3_addr = 0; reg [3:0] port_3_priority; reg port_3_rea;  reg port_3_reading = 0; reg port_3_prepared;
-    reg [16:0] port_4_addr = 0; reg [3:0] port_4_priority; reg port_4_rea;  reg port_4_reading = 0; reg port_4_prepared;
-    reg [16:0] port_5_addr = 0; reg [3:0] port_5_priority; reg port_5_rea;  reg port_5_reading = 0; reg port_5_prepared;
-    reg [16:0] port_6_addr = 0; reg [3:0] port_6_priority; reg port_6_rea;  reg port_6_reading = 0; reg port_6_prepared;
-    reg [16:0] port_7_addr = 0; reg [3:0] port_7_priority; reg port_7_rea;  reg port_7_reading = 0; reg port_7_prepared;
-    reg [16:0] port_8_addr = 0; reg [3:0] port_8_priority; reg port_8_rea;  reg port_8_reading = 0; reg port_8_prepared;
-    reg [16:0] port_9_addr = 0; reg [3:0] port_9_priority; reg port_9_rea;  reg port_9_reading = 0; reg port_9_prepared;
-    reg [16:0] port_10_addr = 0; reg [3:0] port_10_priority; reg port_10_rea;  reg port_10_reading = 0; reg port_10_prepared;
-    reg [16:0] port_11_addr = 0; reg [3:0] port_11_priority; reg port_11_rea;  reg port_11_reading = 0; reg port_11_prepared;
-    reg [16:0] port_12_addr = 0; reg [3:0] port_12_priority; reg port_12_rea;  reg port_12_reading = 0; reg port_12_prepared;
-    reg [16:0] port_13_addr = 0; reg [3:0] port_13_priority; reg port_13_rea;  reg port_13_reading = 0; reg port_13_prepared;
-    reg [16:0] port_14_addr = 0; reg [3:0] port_14_priority; reg port_14_rea;  reg port_14_reading = 0; reg port_14_prepared;
-    reg [16:0] port_15_addr = 0; reg [3:0] port_15_priority; reg port_15_rea;  reg port_15_reading = 0; reg port_15_prepared;
+    wire [16:0] port_0_addr = 0; wire [3:0] port_0_priority; wire port_0_rea;  wire port_0_reading = 0; wire port_0_prepared;
+    wire [16:0] port_1_addr = 0; wire [3:0] port_1_priority; wire port_1_rea;  wire port_1_reading = 0; wire port_1_prepared;
+    wire [16:0] port_2_addr = 0; wire [3:0] port_2_priority; wire port_2_rea;  wire port_2_reading = 0; wire port_2_prepared;
+    wire [16:0] port_3_addr = 0; wire [3:0] port_3_priority; wire port_3_rea;  wire port_3_reading = 0; wire port_3_prepared;
+    wire [16:0] port_4_addr = 0; wire [3:0] port_4_priority; wire port_4_rea;  wire port_4_reading = 0; wire port_4_prepared;
+    wire [16:0] port_5_addr = 0; wire [3:0] port_5_priority; wire port_5_rea;  wire port_5_reading = 0; wire port_5_prepared;
+    wire [16:0] port_6_addr = 0; wire [3:0] port_6_priority; wire port_6_rea;  wire port_6_reading = 0; wire port_6_prepared;
+    wire [16:0] port_7_addr = 0; wire [3:0] port_7_priority; wire port_7_rea;  wire port_7_reading = 0; wire port_7_prepared;
+    wire [16:0] port_8_addr = 0; wire [3:0] port_8_priority; wire port_8_rea;  wire port_8_reading = 0; wire port_8_prepared;
+    wire [16:0] port_9_addr = 0; wire [3:0] port_9_priority; wire port_9_rea;  wire port_9_reading = 0; wire port_9_prepared;
+    wire [16:0] port_10_addr = 0; wire [3:0] port_10_priority; wire port_10_rea;  wire port_10_reading = 0; wire port_10_prepared;
+    wire [16:0] port_11_addr = 0; wire [3:0] port_11_priority; wire port_11_rea;  wire port_11_reading = 0; wire port_11_prepared;
+    wire [16:0] port_12_addr = 0; wire [3:0] port_12_priority; wire port_12_rea;  wire port_12_reading = 0; wire port_12_prepared;
+    wire [16:0] port_13_addr = 0; wire [3:0] port_13_priority; wire port_13_rea;  wire port_13_reading = 0; wire port_13_prepared;
+    wire [16:0] port_14_addr = 0; wire [3:0] port_14_priority; wire port_14_rea;  wire port_14_reading = 0; wire port_14_prepared;
+    wire [16:0] port_15_addr = 0; wire [3:0] port_15_priority; wire port_15_rea;  wire port_15_reading = 0; wire port_15_prepared;
 
     // ports for fifo
     reg in_clk;
@@ -204,6 +204,18 @@ module top #(
         .rd_request2                (rd_request2),
         .enb                        (enb)
     );
+
+    sram u_sram(
+        .clka(),
+        .ena(),
+        .wea(),
+        .addra(),
+        .dina(),
+        .clkb(),
+        .enb(),
+        .addrb(),
+        .doutb()
+    )
 
 
 endmodule
