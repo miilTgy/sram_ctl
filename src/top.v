@@ -39,28 +39,28 @@ module top #(
     reg [7:0] w_size; //写入包长度
     reg [2:0] priority; //该数据包的优先级，0~7
     reg [3:0] dest_port; //该数据包的目标端口;0~15
-    reg [11:0] write_address = 0; //写入地址
+    reg [16:0] write_address = 0; //写入地址
     reg writing = 0; //正在传输写入地址时拉高
 
     //package_output_related_declaration
 
     //port_n_addr为输出地址线； port_n_priority为需求优先级； port_n_rea为n端口读出请求； port_n_reading为n端口输出有效；
-    reg [11:0] port_0_addr = 0; reg [3:0] port_0_priority; reg port_0_rea;  reg port_0_reading = 0;
-    reg [11:0] port_1_addr = 0; reg [3:0] port_1_priority; reg port_1_rea;  reg port_1_reading = 0;
-    reg [11:0] port_2_addr = 0; reg [3:0] port_2_priority; reg port_2_rea;  reg port_2_reading = 0;
-    reg [11:0] port_3_addr = 0; reg [3:0] port_3_priority; reg port_3_rea;  reg port_3_reading = 0;
-    reg [11:0] port_4_addr = 0; reg [3:0] port_4_priority; reg port_4_rea;  reg port_4_reading = 0;
-    reg [11:0] port_5_addr = 0; reg [3:0] port_5_priority; reg port_5_rea;  reg port_5_reading = 0;
-    reg [11:0] port_6_addr = 0; reg [3:0] port_6_priority; reg port_6_rea;  reg port_6_reading = 0;
-    reg [11:0] port_7_addr = 0; reg [3:0] port_7_priority; reg port_7_rea;  reg port_7_reading = 0;
-    reg [11:0] port_8_addr = 0; reg [3:0] port_8_priority; reg port_8_rea;  reg port_8_reading = 0;
-    reg [11:0] port_9_addr = 0; reg [3:0] port_9_priority; reg port_9_rea;  reg port_9_reading = 0;
-    reg [11:0] port_10_addr = 0; reg [3:0] port_10_priority; reg port_10_rea;  reg port_10_reading = 0;
-    reg [11:0] port_11_addr = 0; reg [3:0] port_11_priority; reg port_11_rea;  reg port_11_reading = 0;
-    reg [11:0] port_12_addr = 0; reg [3:0] port_12_priority; reg port_12_rea;  reg port_12_reading = 0;
-    reg [11:0] port_13_addr = 0; reg [3:0] port_13_priority; reg port_13_rea;  reg port_13_reading = 0;
-    reg [11:0] port_14_addr = 0; reg [3:0] port_14_priority; reg port_14_rea;  reg port_14_reading = 0;
-    reg [11:0] port_15_addr = 0; reg [3:0] port_15_priority; reg port_15_rea;  reg port_15_reading = 0;
+    reg [16:0] port_0_addr = 0; reg [3:0] port_0_priority; reg port_0_rea;  reg port_0_reading = 0;
+    reg [16:0] port_1_addr = 0; reg [3:0] port_1_priority; reg port_1_rea;  reg port_1_reading = 0;
+    reg [16:0] port_2_addr = 0; reg [3:0] port_2_priority; reg port_2_rea;  reg port_2_reading = 0;
+    reg [16:0] port_3_addr = 0; reg [3:0] port_3_priority; reg port_3_rea;  reg port_3_reading = 0;
+    reg [16:0] port_4_addr = 0; reg [3:0] port_4_priority; reg port_4_rea;  reg port_4_reading = 0;
+    reg [16:0] port_5_addr = 0; reg [3:0] port_5_priority; reg port_5_rea;  reg port_5_reading = 0;
+    reg [16:0] port_6_addr = 0; reg [3:0] port_6_priority; reg port_6_rea;  reg port_6_reading = 0;
+    reg [16:0] port_7_addr = 0; reg [3:0] port_7_priority; reg port_7_rea;  reg port_7_reading = 0;
+    reg [16:0] port_8_addr = 0; reg [3:0] port_8_priority; reg port_8_rea;  reg port_8_reading = 0;
+    reg [16:0] port_9_addr = 0; reg [3:0] port_9_priority; reg port_9_rea;  reg port_9_reading = 0;
+    reg [16:0] port_10_addr = 0; reg [3:0] port_10_priority; reg port_10_rea;  reg port_10_reading = 0;
+    reg [16:0] port_11_addr = 0; reg [3:0] port_11_priority; reg port_11_rea;  reg port_11_reading = 0;
+    reg [16:0] port_12_addr = 0; reg [3:0] port_12_priority; reg port_12_rea;  reg port_12_reading = 0;
+    reg [16:0] port_13_addr = 0; reg [3:0] port_13_priority; reg port_13_rea;  reg port_13_reading = 0;
+    reg [16:0] port_14_addr = 0; reg [3:0] port_14_priority; reg port_14_rea;  reg port_14_reading = 0;
+    reg [16:0] port_15_addr = 0; reg [3:0] port_15_priority; reg port_15_rea;  reg port_15_reading = 0;
 
     cache_manager u_cache_manager(
         .rst(rst),
