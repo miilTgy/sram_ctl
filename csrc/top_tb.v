@@ -10,7 +10,7 @@ module top_tb ();
     parameter des_port_width = 7;
     parameter address_width = 12;
     parameter num_of_priority = 8;
-    parameter data_width = 16;
+    parameter data_width = 64;
     parameter num_of_priorities = 8;
 
 
@@ -18,7 +18,7 @@ module top_tb ();
     reg sp0_wrr1;
     reg [num_of_ports-1:0] wr_sop, wr_eop, wr_vld;
     reg [data_width*num_of_ports-1:0] wr_data;
-    reg [num_of_priorities*num_of_ports-1:0] ready;
+    reg [num_of_ports-1:0] ready;
 
     wire [num_of_ports-1:0] rd_sop, rd_eop, rd_vld;
     wire [num_of_ports*data_width-1:0] rd_data;
