@@ -92,14 +92,40 @@ module top #(
     wire [num_of_priorities-1:0] prepared; // TODO
     reg [wrr_weight_width-1:0] wrr_weight;
     wire [num_of_priorities-1:0] next_data2;
-    assign {port_0_rea,port_1_rea,port_2_rea,port_3_rea,port_4_rea,port_5_rea,port_6_rea,port_7_rea,port_8_rea,port_9_rea,port_10_rea,port_11_rea,port_12_rea,port_13_rea,port_14_rea,port_15_rea} = next_data2;
+    assign {port_15_rea,port_14_rea,port_13_rea,port_12_rea,port_11_rea,port_10_rea,port_9_rea,port_8_rea,port_7_rea,port_6_rea,port_5_rea,port_4_rea,port_3_rea,port_2_rea,port_1_rea,port_0_rea} = next_data2;
 
     reg [arbiter_data_width-1:0] data_read;
     reg last1, last2;
-    reg [address_width-1:0] address_to_read1, address_to_read2;
+    reg [address_width-1:0] address_to_read1;
+    wire [address_width*num_of_ports-1:0] address_to_read2;
+    assign address_to_read2 = {port_15_addr,port_14_addr,port_13_addr,port_12_addr,port_11_addr,port_10_addr,port_9_addr,port_8_addr,port_7_addr,port_6_addr,port_5_addr,port_4_addr,port_3_addr,port_2_addr,port_1_addr,port_0_addr};
     wire [address_width-1:0] address_read1, address_read2;
     wire rd_request1, rd_request2;
     wire enb;
+
+    reg unused;
+
+    always @(*) begin
+        case (1'b1)
+            next_data2[0]: addrb = address_read2[0];
+            next_data2[1]: addrb = address_read2[1];
+            next_data2[2]: addrb = address_read2[2];
+            next_data2[3]: addrb = address_read2[3];
+            next_data2[4]: addrb = address_read2[4];
+            next_data2[5]: addrb = address_read2[5];
+            next_data2[6]: addrb = address_read2[6];
+            next_data2[7]: addrb = address_read2[7];
+            next_data2[8]: addrb = address_read2[8];
+            next_data2[9]: addrb = address_read2[9];
+            next_data2[10]: addrb = address_read2[10];
+            next_data2[11]: addrb = address_read2[11];
+            next_data2[12]: addrb = address_read2[12];
+            next_data2[13]: addrb = address_read2[13];
+            next_data2[14]: addrb = address_read2[14];
+            next_data2[15]: addrb = address_read2[15];
+            default: unused = unused;
+        endcase
+    end
 
 
     cache_manager u_cache_manager(
@@ -185,7 +211,7 @@ module top #(
         .address_write              (),
         .data_write                 (),
         .write_enable1              (),
-        pack_length                 (w_size),
+        .pack_length                (w_size)
     );
 
     read_arbiter read_arbiter_tt[num_of_ports-1:0] (
