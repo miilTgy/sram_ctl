@@ -5,7 +5,7 @@ module write_arbiter #(
     parameter arbiter_data_width = 64,
     parameter priority_width     = 3,
     parameter des_port_width     = 4,
-    parameter pack_length_width  = 7
+    parameter pack_length_width  = 8
 ) (
     // ports
     input                                                       rst,

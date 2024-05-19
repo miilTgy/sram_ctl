@@ -4,7 +4,7 @@ module read_arbiter #(
     parameter num_of_priorities = 8,
     parameter priority_width = 3,
     parameter num_of_ports = 16,
-    parameter address_width = 12,
+    parameter address_width = 17,
     parameter arbiter_data_width = 64,
     parameter wrr_weight_width = 5
 ) (

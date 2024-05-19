@@ -7,6 +7,7 @@
 // 此模块中只能例化和拉线。
 // You can only instantiate modules or creat wire/regs in this module.
 
+
 module top #(
         // parameters
         parameter num_of_ports    = 16,
@@ -14,8 +15,9 @@ module top #(
         parameter num_of_priority = 8,
         parameter priority_width  = 3,
         parameter num_of_priorities=8,
-        parameter des_port_width  = 7,
-        parameter address_width   = 12
+        parameter des_port_width  = 4,
+        parameter address_width   = 17,
+        parameter wrr_weight_width= 5
     ) (
         // ports
         input                                           sp0_wrr1,
@@ -23,13 +25,13 @@ module top #(
         input       [num_of_ports-1:0]                  wr_eop,
         input       [num_of_ports-1:0]                  wr_vld,
         input       [data_width*num_of_ports-1:0]       wr_data,
-        input       [num_of_priority*num_of_ports-1:0]  ready,
-        output  reg [num_of_ports-1:0]                  rd_sop,
-        output  reg [num_of_ports-1:0]                  rd_eop,
-        output  reg [num_of_ports-1:0]                  rd_vld,
-        output  reg [data_width*num_of_ports-1:0]       rd_data,
-        output  reg [num_of_priority*num_of_ports-1:0]  full,
-        output  reg [num_of_priority*num_of_ports-1:0]  almost_full
+        input       [num_of_ports-1:0]  ready,
+        output  wire [num_of_ports-1:0]                  rd_sop,
+        output  wire [num_of_ports-1:0]                  rd_eop,
+        output  wire [num_of_ports-1:0]                  rd_vld,
+        output  wire [data_width*num_of_ports-1:0]       rd_data,
+        output  reg                                     full,
+        output  reg                                     almost_full
     );
 
 
@@ -66,20 +68,20 @@ module top #(
 
     // ports for fifo
     reg in_clk;
-    wire [fifo_data_width-1:0] wr_data_unpack [num_of_ports-1:0]; // packed
-    wire [fifo_data_width*num_of_ports-1:0] out_data;
+    wire [data_width-1:0] wr_data_unpack [num_of_ports-1:0]; // packed
+    wire [data_width*num_of_ports-1:0] out_data;
 
     // ports for between fifo and write_arbiter
     wire [num_of_ports-1:0] sop, eop, vld;
     wire [num_of_ports-1:0] overflow;
     wire [num_of_ports-1:0] ready_between;
     wire [num_of_ports-1:0] next_data;
-    wire [fifo_data_width-1:0] between_data_unpack [num_of_ports-1:0]; // 接到fifo的out_data
+    wire [data_width-1:0] between_data_unpack [num_of_ports-1:0]; // 接到fifo的out_data
 
     // ports for write_arbiter
     wire busy;
-    wire [arbiter_data_width-1:0] data_out; // packed
-    wire [fifo_data_width*num_of_ports-1:0] data_in_p; // packed
+    wire [data_width-1:0] data_out; // packed
+    wire [data_width*num_of_ports-1:0] data_in_p; // packed
     wire [3:0] arbiter_des_port_out, pre_des_port_out;
     wire [3:0] pre_selected;
     wire [priority_width-1:0] priority_out;
@@ -92,9 +94,9 @@ module top #(
     wire [num_of_priorities-1:0] next_data2;
     assign {port_15_rea,port_14_rea,port_13_rea,port_12_rea,port_11_rea,port_10_rea,port_9_rea,port_8_rea,port_7_rea,port_6_rea,port_5_rea,port_4_rea,port_3_rea,port_2_rea,port_1_rea,port_0_rea} = next_data2;
 
-    reg [arbiter_data_width-1:0] data_read;
-    reg last1, last2;
-    reg [address_width-1:0] address_to_read1;
+    wire [data_width-1:0] data_read;
+    wire last1, last2;
+    wire [address_width-1:0] address_to_read1;
     wire [address_width*num_of_ports-1:0] address_to_read2;
     assign address_to_read2 = {port_15_addr,port_14_addr,port_13_addr,port_12_addr,port_11_addr,port_10_addr,port_9_addr,port_8_addr,port_7_addr,port_6_addr,port_5_addr,port_4_addr,port_3_addr,port_2_addr,port_1_addr,port_0_addr};
     wire [address_width-1:0] address_read1, address_read2;
@@ -106,8 +108,10 @@ module top #(
     wire wea_sram;
     wire [16:0] addra;
     wire [63:0] dina;
-    wire [16:0] addrb;
+    reg [16:0] addrb;
     wire [63:0] doutb;
+
+    assign data_read = doutb;
     
 
     reg unused;
@@ -219,7 +223,7 @@ module top #(
         .address_write              (addra),
         .data_write                 (dina),
         .write_enable1              (wea_sram),
-        pack_length                 (w_size),
+        .pack_length                 (w_size)
     );
 
     read_arbiter read_arbiter_tt[num_of_ports-1:0] (
@@ -257,7 +261,7 @@ module top #(
         .enb(1'b1),
         .addrb(addrb),
         .doutb(doutb)
-    )
+    );
 
 
 endmodule

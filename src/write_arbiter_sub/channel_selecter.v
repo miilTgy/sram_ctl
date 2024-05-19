@@ -3,7 +3,7 @@ module channel_selecter #(
     parameter num_of_ports = 16,
     parameter arbiter_data_width = 64,
     parameter des_port_width = 4,
-    parameter pack_length_width  = 7
+    parameter pack_length_width  = 8
 ) (
     // ports
     input                                                   clk,

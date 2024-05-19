@@ -3,10 +3,10 @@ module datasg #(
     // [x] Make parameters
     parameter num_of_ports = 16,
     parameter sg_data_width = 64,
-    parameter sg_address_width = 16,
+    parameter sg_address_width = 17,
     parameter sg_des_width = 4,
     parameter sg_priority_width = 3,
-    parameter sg_pack_length_width = 7
+    parameter sg_pack_length_width = 8
 ) (
     // ports
     // [x] Make ports
@@ -17,7 +17,7 @@ module datasg #(
     input           [num_of_ports-1:0]          eop,
     input           [sg_data_width-1:0]         data_in,
     input           [sg_address_width-1:0]      address_in,
-    input           [sg_address_width-1:0]      priority_in,
+    input           [sg_priority_width-1:0]      priority_in,
     input           [sg_des_width-1:0]          des_port_in,
     input           [sg_pack_length_width-1:0]  pack_length_in,
     output  reg                                 request,
@@ -30,7 +30,7 @@ module datasg #(
     output  wire                                write_enable2,
     output  wire                                write_enable3,
     output  wire                                write_enable4,
-    output  wire    [ab_pack_length_out-1:0]    pack_length
+    output  wire    [sg_pack_length_width-1:0]    pack_length
 );
     // [x] Complete this
     reg writting;

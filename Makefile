@@ -1,14 +1,25 @@
-MOD_NAME = cache_manager_zgy
+MOD_NAME = top
 # MOD_NAME = read_arbiter
 
 MOD_PATH = src
 TB_PATH = csrc
 
-MOD = $(shell find $(abspath $(MOD_PATH)) -name $(MOD_NAME).v)
+# MOD = $(shell find $(abspath $(MOD_PATH)) -name $(MOD_NAME).v)
+# MOD += $(shell find $(abspath $(MOD_PATH)) -name *.v -type f ! -name blk_mem_gen_0_sim_netlist.v -type f ! -name blk_mem_gen_0_stub.v)
+MOD += $(shell find $(abspath $(MOD_PATH)) -name top.v)
+MOD += $(shell find $(abspath $(MOD_PATH)) -name fifo.v)
+MOD += $(shell find $(abspath $(MOD_PATH)) -name write_arbiter.v)
+MOD += $(shell find $(abspath $(MOD_PATH)) -name datasg.v)
+MOD += $(shell find $(abspath $(MOD_PATH)) -name sram.v)
+MOD += $(shell find $(abspath $(MOD_PATH)) -name read_arbiter.v)
+MOD += $(shell find $(abspath $(MOD_PATH)) -name cache_manager.v)
+# MOD -= "sram/blk_mem_gen_0_sim_netlist.v"
 # MOD += $(shell find $(abspath $(MOD_PATH)) -name write_arbiter.v)
 # MOD += $(shell find $(abspath $(MOD_PATH)) -name datasg.v)
 # MOD += $(shell find $(abspath $(MOD_PATH)/$(MOD_NAME)_sub) -name *.v)
-# MOD += $(shell find $(abspath $(MOD_PATH)/write_arbiter_sub) -name *.v)
+MOD += $(shell find $(abspath $(MOD_PATH)/write_arbiter_sub) -name *.v)
+MOD += $(shell find $(abspath $(MOD_PATH)/sram/sim) -name *.v)
+MOD += $(shell find $(abspath $(MOD_PATH)/sram/simulation) -name *.v)
 iMOD = $(MOD)
 TB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.cpp)
 iTB = $(shell find $(abspath $(TB_PATH)) -name $(MOD_NAME)_tb.v) # TODO Uncomment this

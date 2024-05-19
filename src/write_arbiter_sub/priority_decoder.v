@@ -4,7 +4,7 @@ module priority_decoder #(
     parameter num_of_ports       = 16,
     parameter priority_width     = 3,
     parameter des_port_width     = 4,
-    parameter pack_length_width  = 7
+    parameter pack_length_width  = 8
 ) (
     // ports
     input                                               clk,
@@ -37,7 +37,7 @@ module priority_decoder #(
             assign des_port_tmp[j] = priority_decoder_in[(j+1)*arbiter_data_width-1:j*arbiter_data_width];
             assign des_ports[j] = des_port_tmp[j][3:0];
             assign pack_length_tmp[j] = priority_decoder_in[(j+1)*arbiter_data_width-1:j*arbiter_data_width];
-            assign pack_length[j] = pack_length_tmp[j][13:7];
+            assign pack_length[j] = pack_length_tmp[j][14:7];
             // assign des_port_out[(j+1)*des_port_width-1:j*des_port_width] = des_ports[j];
         end
     endgenerate
