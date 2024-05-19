@@ -1,6 +1,6 @@
 `timescale 100ps/10ps
 
-module chain_manager_tb();
+module cache_manager_tb();
 
   reg rst;
   reg clk = 1;
@@ -23,7 +23,7 @@ module chain_manager_tb();
   reg [99:0] port_0_rea_in;
 
 
-chain_manager ch(
+cache_manager ch(
   .rst(rst),
   .clk(clk),
 
@@ -45,8 +45,8 @@ chain_manager ch(
 
 //GTKwave配置
   initial begin
-    $dumpfile("wave_chain.vcd");        //生成的vcd文件名称
-    $dumpvars(0, chain_manager_tb);    //tb模块名称
+    $dumpfile("wave_cache.vcd");        //生成的vcd文件名称
+    $dumpvars(0, cache_manager_tb);    //tb模块名称
 
     for(i = 0; i<=50; i=i+1) begin
         $dumpvars(0,ch.chain[i]);

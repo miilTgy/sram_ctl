@@ -1,7 +1,7 @@
 //用于记录内存空间的链表，寻找内存可用空间和内存回收
 //author: Dreams Zhou
 
-module chain_manager
+module cache_manager
 #(
     parameter units = 512, //链表单元数量,sram为4096*8Bytes，数据包最小为64Bytes
     parameter next = 48, //[48:37]为next
