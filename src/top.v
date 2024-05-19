@@ -153,7 +153,7 @@ module top #(
     write_arbiter write_arbiter_tt1 (
         .rst                        (rst),
         .clk                        (clk),
-        .sp0_wrr1                   (sp0_wrr1),
+        .sp0_wrr1                   (1'b0),
         .ready                      (ready_between),
         .sop                        (sop),
         .eop                        (eop),
