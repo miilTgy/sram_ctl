@@ -21,6 +21,9 @@ module top #(
         parameter pack_length_width  = 8
     ) (
         // ports
+        input                                           rst,
+        input                                           clk,
+        input                                           in_clk,
         input                                           sp0_wrr1,
         input       [num_of_ports-1:0]                  wr_sop,
         input       [num_of_ports-1:0]                  wr_eop,
@@ -36,9 +39,6 @@ module top #(
     );
 
 
-
-    wire rst;
-    wire clk;
 
     //ports for cache_manager
 
@@ -68,7 +68,6 @@ module top #(
     wire [16:0] port_15_addr = 0; wire [3:0] port_15_priority; wire port_15_rea;  wire port_15_reading = 0; wire port_15_prepared;
 
     // ports for fifo
-    reg in_clk;
     wire [data_width-1:0] wr_data_unpack [num_of_ports-1:0]; // packed
     wire [data_width*num_of_ports-1:0] out_data;
 
