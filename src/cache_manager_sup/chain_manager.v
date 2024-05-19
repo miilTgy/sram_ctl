@@ -174,7 +174,7 @@ module chain_manager
                             queue[dest_port*8+priority][ queue_num[dest_port*8+priority] ] = write_pointer; //在当前队尾处写入该链表节点id
                             queue_num[dest_port*8+priority] = queue_num[dest_port*8+priority] + 1; //该队列项目数量+1
 
-                            write_done = 1;
+                            write_done = 1; //已经找到块了，后续循环作废
                         end
                         else begin  //如果内存块长度大于分配长度，则将该块一分为二
                             chain[new_block][prev-:12] = write_pointer; //新块的prev指向旧块节点序号
@@ -207,7 +207,7 @@ module chain_manager
 
                             $display("entered an end");
 
-                            write_done = 1;
+                            write_done = 1; //已经找到块了，后续循环作废
                         end
                     
                     end
@@ -221,10 +221,12 @@ module chain_manager
     end
 
 //----------read-out-package----------
+
+    //Port0
     always @(posedge clk) begin //正在传输地址
         if(port_0_reading && port_0_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
-            port_0_addr = port_0_addr + 1;
-            port_0_addr_left = port_0_addr_left - 1;
+            port_0_addr = port_0_addr + 1; //地址前进一位
+            port_0_addr_left = port_0_addr_left - 1; //剩余位数减少一位
         end
         else port_0_reading = 0; //读取完毕
     end
@@ -232,7 +234,7 @@ module chain_manager
         if (port_0_rea && port_0_reading == 0) begin
             if( queue_num[ port_0_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
                 port_0_addr = chain[ queue[ port_0_priority ][0] ][sa-:12]; //输出队列头项的起始地址
-                port_0_addr_left = chain[ queue[ port_0_priority ][0] ][size-:12] - 1;
+                port_0_addr_left = chain[ queue[ port_0_priority ][0] ][size-:12] - 1; //标记剩余位数
                 port_0_reading = 1; //允许读出
                 
                 chain[ queue[ port_0_priority ][0] ][state] = 0; //该链表节点state设为0
@@ -244,6 +246,382 @@ module chain_manager
         else out_loop_0 = 0;
            
     end
+
+    //Port1
+    always @(posedge clk) begin //正在传输地址
+        if(port_1_reading && port_1_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_1_addr = port_1_addr + 1; //地址前进一位
+            port_1_addr_left = port_1_addr_left - 1; //剩余位数减少一位
+        end
+        else port_1_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_1_rea && port_1_reading == 0) begin
+            if( queue_num[ 8+port_1_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_1_addr = chain[ queue[ 8+port_1_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_1_addr_left = chain[ queue[ 8+port_1_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_1_reading = 1; //允许读出
+                
+                chain[ queue[ 8+port_1_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 8+port_1_priority ] = queue_num[ 8+port_1_priority ] - 1; //该队列长度减1
+
+                for(out_loop_1=0;out_loop_1<15;out_loop_1=out_loop_1+1)
+                    queue[ 8+port_1_priority ][out_loop_1] = queue[ 8+port_1_priority ][out_loop_1+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_1 = 0;
+           
+    end
+
+    //Port2
+    always @(posedge clk) begin //正在传输地址
+        if(port_2_reading && port_2_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_2_addr = port_2_addr + 1; //地址前进一位
+            port_2_addr_left = port_2_addr_left - 1; //剩余位数减少一位
+        end
+        else port_2_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_2_rea && port_2_reading == 0) begin
+            if( queue_num[ 16+port_2_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_2_addr = chain[ queue[ 16+port_2_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_2_addr_left = chain[ queue[ 16+port_2_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_2_reading = 1; //允许读出
+                
+                chain[ queue[ 16+port_2_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 16+port_2_priority ] = queue_num[ 16+port_2_priority ] - 1; //该队列长度减1
+
+                for(out_loop_2=0;out_loop_2<15;out_loop_2=out_loop_2+1)
+                    queue[ 16+port_2_priority ][out_loop_2] = queue[ 16+port_2_priority ][out_loop_2+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_2 = 0;
+           
+    end
+
+    //Port3
+    always @(posedge clk) begin //正在传输地址
+        if(port_3_reading && port_3_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_3_addr = port_3_addr + 1; //地址前进一位
+            port_3_addr_left = port_3_addr_left - 1; //剩余位数减少一位
+        end
+        else port_3_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_3_rea && port_3_reading == 0) begin
+            if( queue_num[ 24+port_3_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_3_addr = chain[ queue[ 24+port_3_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_3_addr_left = chain[ queue[ 24+port_3_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_3_reading = 1; //允许读出
+                
+                chain[ queue[ 24+port_3_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 24+port_3_priority ] = queue_num[ 24+port_3_priority ] - 1; //该队列长度减1
+
+                for(out_loop_3=0;out_loop_3<15;out_loop_3=out_loop_3+1)
+                    queue[ 24+port_3_priority ][out_loop_3] = queue[ 24+port_3_priority ][out_loop_3+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_3 = 0;
+           
+    end
+
+    //Port4
+    always @(posedge clk) begin //正在传输地址
+        if(port_4_reading && port_4_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_4_addr = port_4_addr + 1; //地址前进一位
+            port_4_addr_left = port_4_addr_left - 1; //剩余位数减少一位
+        end
+        else port_4_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_4_rea && port_4_reading == 0) begin
+            if( queue_num[ 32+port_4_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_4_addr = chain[ queue[ 32+port_4_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_4_addr_left = chain[ queue[ 32+port_4_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_4_reading = 1; //允许读出
+                
+                chain[ queue[ 32+port_4_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 32+port_4_priority ] = queue_num[ 32+port_4_priority ] - 1; //该队列长度减1
+
+                for(out_loop_4=0;out_loop_4<15;out_loop_4=out_loop_4+1)
+                    queue[ 32+port_4_priority ][out_loop_4] = queue[ 32+port_4_priority ][out_loop_4+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_4 = 0;
+           
+    end
+
+    //Port5
+    always @(posedge clk) begin //正在传输地址
+        if(port_5_reading && port_5_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_5_addr = port_5_addr + 1; //地址前进一位
+            port_5_addr_left = port_5_addr_left - 1; //剩余位数减少一位
+        end
+        else port_5_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_5_rea && port_5_reading == 0) begin
+            if( queue_num[ 40+port_5_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_5_addr = chain[ queue[ 40+port_5_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_5_addr_left = chain[ queue[ 40+port_5_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_5_reading = 1; //允许读出
+                
+                chain[ queue[ 40+port_5_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 40+port_5_priority ] = queue_num[ 40+port_5_priority ] - 1; //该队列长度减1
+
+                for(out_loop_5=0;out_loop_5<15;out_loop_5=out_loop_5+1)
+                    queue[ 40+port_5_priority ][out_loop_5] = queue[ 40+port_5_priority ][out_loop_5+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_5 = 0;
+           
+    end
+
+    //Port6
+    always @(posedge clk) begin //正在传输地址
+        if(port_6_reading && port_6_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_6_addr = port_6_addr + 1; //地址前进一位
+            port_6_addr_left = port_6_addr_left - 1; //剩余位数减少一位
+        end
+        else port_6_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_6_rea && port_6_reading == 0) begin
+            if( queue_num[ 48+port_6_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_6_addr = chain[ queue[ 48+port_6_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_6_addr_left = chain[ queue[ 48+port_6_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_6_reading = 1; //允许读出
+                
+                chain[ queue[ 48+port_6_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 48+port_6_priority ] = queue_num[ 48+port_6_priority ] - 1; //该队列长度减1
+
+                for(out_loop_6=0;out_loop_6<15;out_loop_6=out_loop_6+1)
+                    queue[ 48+port_6_priority ][out_loop_6] = queue[ 48+port_6_priority ][out_loop_6+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_6 = 0;
+           
+    end
+
+    //Port7
+    always @(posedge clk) begin //正在传输地址
+        if(port_7_reading && port_7_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_7_addr = port_7_addr + 1; //地址前进一位
+            port_7_addr_left = port_7_addr_left - 1; //剩余位数减少一位
+        end
+        else port_7_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_7_rea && port_7_reading == 0) begin
+            if( queue_num[ 56+port_7_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_7_addr = chain[ queue[ 56+port_7_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_7_addr_left = chain[ queue[ 56+port_7_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_7_reading = 1; //允许读出
+                
+                chain[ queue[ 56+port_7_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 56+port_7_priority ] = queue_num[ 56+port_7_priority ] - 1; //该队列长度减1
+
+                for(out_loop_7=0;out_loop_7<15;out_loop_7=out_loop_7+1)
+                    queue[ 56+port_7_priority ][out_loop_7] = queue[ 56+port_7_priority ][out_loop_7+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_7 = 0;
+           
+    end
+
+    //Port8
+    always @(posedge clk) begin //正在传输地址
+        if(port_8_reading && port_8_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_8_addr = port_8_addr + 1; //地址前进一位
+            port_8_addr_left = port_8_addr_left - 1; //剩余位数减少一位
+        end
+        else port_8_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_8_rea && port_8_reading == 0) begin
+            if( queue_num[ 64+port_8_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_8_addr = chain[ queue[ 64+port_8_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_8_addr_left = chain[ queue[ 64+port_8_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_8_reading = 1; //允许读出
+                
+                chain[ queue[ 64+port_8_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 64+port_8_priority ] = queue_num[ 64+port_8_priority ] - 1; //该队列长度减1
+
+                for(out_loop_8=0;out_loop_8<15;out_loop_8=out_loop_8+1)
+                    queue[ 64+port_8_priority ][out_loop_8] = queue[ 64+port_8_priority ][out_loop_8+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_8 = 0;
+           
+    end
+
+    //Port9
+    always @(posedge clk) begin //正在传输地址
+        if(port_9_reading && port_9_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_9_addr = port_9_addr + 1; //地址前进一位
+            port_9_addr_left = port_9_addr_left - 1; //剩余位数减少一位
+        end
+        else port_9_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_9_rea && port_9_reading == 0) begin
+            if( queue_num[ 72+port_9_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_9_addr = chain[ queue[ 72+port_9_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_9_addr_left = chain[ queue[ 72+port_9_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_9_reading = 1; //允许读出
+                
+                chain[ queue[ 72+port_9_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 72+port_9_priority ] = queue_num[ 72+port_9_priority ] - 1; //该队列长度减1
+
+                for(out_loop_9=0;out_loop_9<15;out_loop_9=out_loop_9+1)
+                    queue[ 72+port_9_priority ][out_loop_9] = queue[ 72+port_9_priority ][out_loop_9+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_9 = 0;
+           
+    end
+
+    //Port10
+    always @(posedge clk) begin //正在传输地址
+        if(port_10_reading && port_10_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_10_addr = port_10_addr + 1; //地址前进一位
+            port_10_addr_left = port_10_addr_left - 1; //剩余位数减少一位
+        end
+        else port_10_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_10_rea && port_10_reading == 0) begin
+            if( queue_num[ 80+port_10_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_10_addr = chain[ queue[ 80+port_10_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_10_addr_left = chain[ queue[ 80+port_10_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_10_reading = 1; //允许读出
+                
+                chain[ queue[ 80+port_10_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 80+port_10_priority ] = queue_num[ 80+port_10_priority ] - 1; //该队列长度减1
+
+                for(out_loop_10=0;out_loop_10<15;out_loop_10=out_loop_10+1)
+                    queue[ 80+port_10_priority ][out_loop_10] = queue[ 80+port_10_priority ][out_loop_10+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_10 = 0;
+           
+    end
+
+    //Port11
+    always @(posedge clk) begin //正在传输地址
+        if(port_11_reading && port_11_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_11_addr = port_11_addr + 1; //地址前进一位
+            port_11_addr_left = port_11_addr_left - 1; //剩余位数减少一位
+        end
+        else port_11_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_11_rea && port_11_reading == 0) begin
+            if( queue_num[ 88+port_11_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_11_addr = chain[ queue[ 88+port_11_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_11_addr_left = chain[ queue[ 88+port_11_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_11_reading = 1; //允许读出
+                
+                chain[ queue[ 88+port_11_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 88+port_11_priority ] = queue_num[ 88+port_11_priority ] - 1; //该队列长度减1
+
+                for(out_loop_11=0;out_loop_11<15;out_loop_11=out_loop_11+1)
+                    queue[ 88+port_11_priority ][out_loop_11] = queue[ 88+port_11_priority ][out_loop_11+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_11 = 0;
+           
+    end
+
+    //Port12
+    always @(posedge clk) begin //正在传输地址
+        if(port_12_reading && port_12_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_12_addr = port_12_addr + 1; //地址前进一位
+            port_12_addr_left = port_12_addr_left - 1; //剩余位数减少一位
+        end
+        else port_12_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_12_rea && port_12_reading == 0) begin
+            if( queue_num[ 96+port_12_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_12_addr = chain[ queue[ 96+port_12_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_12_addr_left = chain[ queue[ 96+port_12_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_12_reading = 1; //允许读出
+                
+                chain[ queue[ 96+port_12_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 96+port_12_priority ] = queue_num[ 96+port_12_priority ] - 1; //该队列长度减1
+
+                for(out_loop_12=0;out_loop_12<15;out_loop_12=out_loop_12+1)
+                    queue[ 96+port_12_priority ][out_loop_12] = queue[ 96+port_12_priority ][out_loop_12+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_12 = 0;
+           
+    end
+
+    //Port13
+    always @(posedge clk) begin //正在传输地址
+        if(port_13_reading && port_13_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_13_addr = port_13_addr + 1; //地址前进一位
+            port_13_addr_left = port_13_addr_left - 1; //剩余位数减少一位
+        end
+        else port_13_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_13_rea && port_13_reading == 0) begin
+            if( queue_num[ 104+port_13_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_13_addr = chain[ queue[ 104+port_13_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_13_addr_left = chain[ queue[ 104+port_13_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_13_reading = 1; //允许读出
+                
+                chain[ queue[ 104+port_13_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 104+port_13_priority ] = queue_num[ 104+port_13_priority ] - 1; //该队列长度减1
+
+                for(out_loop_13=0;out_loop_13<15;out_loop_13=out_loop_13+1)
+                    queue[ 104+port_13_priority ][out_loop_13] = queue[ 104+port_13_priority ][out_loop_13+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_13 = 0;
+           
+    end
+
+    //Port14
+    always @(posedge clk) begin //正在传输地址
+        if(port_14_reading && port_14_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_14_addr = port_14_addr + 1; //地址前进一位
+            port_14_addr_left = port_14_addr_left - 1; //剩余位数减少一位
+        end
+        else port_14_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_14_rea && port_14_reading == 0) begin
+            if( queue_num[ 112+port_14_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_14_addr = chain[ queue[ 112+port_14_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_14_addr_left = chain[ queue[ 112+port_14_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_14_reading = 1; //允许读出
+                
+                chain[ queue[ 112+port_14_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 112+port_14_priority ] = queue_num[ 112+port_14_priority ] - 1; //该队列长度减1
+
+                for(out_loop_14=0;out_loop_14<15;out_loop_14=out_loop_14+1)
+                    queue[ 112+port_14_priority ][out_loop_14] = queue[ 112+port_14_priority ][out_loop_14+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_14 = 0;
+           
+    end
+
+    //Port15
+    always @(posedge clk) begin //正在传输地址
+        if(port_15_reading && port_15_addr_left > 0 ) begin //如果正在读取且还有剩余位未传输
+            port_15_addr = port_15_addr + 1; //地址前进一位
+            port_15_addr_left = port_15_addr_left - 1; //剩余位数减少一位
+        end
+        else port_15_reading = 0; //读取完毕
+    end
+    always @(posedge clk) begin
+        if (port_15_rea && port_15_reading == 0) begin
+            if( queue_num[ 120+port_15_priority ] > 0 ) //如果请求读取的优先级队列有东西可以读
+                port_15_addr = chain[ queue[ 120+port_15_priority ][0] ][sa-:12]; //输出队列头项的起始地址
+                port_15_addr_left = chain[ queue[ 120+port_15_priority ][0] ][size-:12] - 1; //标记剩余位数
+                port_15_reading = 1; //允许读出
+                
+                chain[ queue[ 120+port_15_priority ][0] ][state] = 0; //该链表节点state设为0
+                queue_num[ 120+port_15_priority ] = queue_num[ 120+port_15_priority ] - 1; //该队列长度减1
+
+                for(out_loop_15=0;out_loop_15<15;out_loop_15=out_loop_15+1)
+                    queue[ 120+port_15_priority ][out_loop_15] = queue[ 120+port_15_priority ][out_loop_15+1];//队列内所有项目往前挪一位
+        end
+        else out_loop_15 = 0;
+           
+    end
+
 
 //----------deallocate-nearby-free-space----------
     always @(negedge clk) begin
